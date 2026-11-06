@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<!--
+  =========================================================
+  clubs.html — รายชื่อชมรมและกิจกรรมของแต่ละชมรม
+  JavaScript: js/clubs.js (เริ่มทำงานผ่าน js/router.js)
+  การ์ดชมรมทั้งหมดสร้างจาก clubs และ events ใน data/events.json
+  =========================================================
+-->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ชมรม — Club &amp; Events Hub</title>
+  <meta name="description" content="รายชื่อชมรมในมหาวิทยาลัยและกิจกรรมที่กำลังจะมาถึงของแต่ละชมรม">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="clubs">
+
+  <a class="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">Club &amp; Events Hub</a>
+      <nav aria-label="เมนูหลัก">
+        <ul class="nav-links">
+          <li><a href="index.html">หน้าแรก</a></li>
+          <li><a href="events.html">กิจกรรมทั้งหมด</a></li>
+          <li><a href="clubs.html" aria-current="page">ชมรม</a></li>
+          <li><a href="register.html">ลงทะเบียน</a></li>
+          <li><a href="my-events.html">กิจกรรมของฉัน <span class="nav-badge" id="my-count" hidden>0</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <p class="sample-banner" id="sample-banner" hidden>
+    ข้อมูลบนเว็บนี้เป็นข้อมูลตัวอย่าง ยังไม่ใช่ข้อมูลจริงจากชมรม
+  </p>
+
+  <main id="main">
+
+    <div class="page-head container">
+      <h1>ชมรมในมหาวิทยาลัย</h1>
+      <p>ดูว่าแต่ละชมรมทำอะไร ติดต่อได้ที่ไหน และมีกิจกรรมอะไรที่กำลังจะมาถึง</p>
+    </div>
+
+    <!-- [JS] การ์ดชมรม 1 ใบ = <article class="club"> มี <h2> ชื่อชมรม และรายการกิจกรรมเป็น <ul>
+         ใช้ <article> เพราะแต่ละชมรมเป็นเนื้อหาที่สมบูรณ์ในตัวเอง -->
+    <div class="club-grid container" id="club-grid" aria-busy="true">
+      <p class="grid-message">กำลังโหลดรายชื่อชมรม…</p>
+    </div>
+
+    <noscript>
+      <p class="grid-message">กรุณาเปิดใช้ JavaScript เพื่อดูรายชื่อชมรม</p>
+    </noscript>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-title">Club &amp; Events Hub</p>
+      <p>
+        งาน Mini Project รายวิชา SC17332 กลุ่มที่ 3 ข้อมูลกิจกรรมรวบรวมจากชมรมในมหาวิทยาลัย
+        ดูแหล่งที่มาของข้อมูลได้ใน
+        <a href="https://github.com/">README ของโปรเจกต์</a>
+      </p>
+    </div>
+  </footer>
+
+  <div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+  <!-- JavaScript: ทุกหน้าโหลดครบทุกไฟล์ เพื่อให้ router.js สลับหน้าได้โดยไม่โหลดใหม่
+       ลำดับสำคัญ: common.js ก่อน (ฟังก์ชันที่ใช้ร่วม) → ไฟล์ของแต่ละหน้า → router.js ท้ายสุด (เริ่มทำงาน) -->
+  <script src="js/common.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/clubs.js"></script>
+  <script src="js/register.js"></script>
+  <script src="js/my-events.js"></script>
+  <script src="js/router.js"></script>
+</body>
+</html>

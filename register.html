@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--
+  =========================================================
+  register.html — ฟอร์มลงทะเบียนเข้าร่วมกิจกรรม (F4, F5)
+  JavaScript: js/register.js (เริ่มทำงานผ่าน js/router.js)
+
+  validation 2 ชั้น (ข้อ T2)
+    ชั้นที่ 1 HTML : required, pattern, type="email", minlength
+    ชั้นที่ 2 JS   : อ่านผลจาก HTML (input.validity) แล้วแสดงข้อความภาษาไทยที่เข้าใจง่าย
+                     + กฎที่ HTML ทำเองไม่ได้: ห้ามลงทะเบียนซ้ำ ห้ามเกินที่นั่ง ห้ามลงกิจกรรมที่เริ่มแล้ว
+
+  ทำไมใส่ novalidate ที่ <form>?
+    ถ้าไม่ใส่ เบราว์เซอร์จะแสดงกล่องเตือนของตัวเอง (หน้าตาต่างกันแต่ละเบราว์เซอร์ และหายเร็ว)
+    novalidate ปิดแค่ "กล่องเตือน" แต่ attribute required/pattern ยังทำงาน
+    JS จึงยังเช็กได้ด้วย input.validity.valueMissing, patternMismatch ฯลฯ
+
+  รับค่าจาก URL: register.html?event=e006 → เลือกกิจกรรม e006 ให้ล่วงหน้า
+  =========================================================
+-->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ลงทะเบียนเข้าร่วมกิจกรรม — Club &amp; Events Hub</title>
+  <meta name="description" content="ลงทะเบียนเข้าร่วมกิจกรรมชมรมและดูจำนวนที่นั่งคงเหลือ">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="register">
+
+  <a class="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">Club &amp; Events Hub</a>
+      <nav aria-label="เมนูหลัก">
+        <ul class="nav-links">
+          <li><a href="index.html">หน้าแรก</a></li>
+          <li><a href="events.html">กิจกรรมทั้งหมด</a></li>
+          <li><a href="clubs.html">ชมรม</a></li>
+          <li><a href="register.html" aria-current="page">ลงทะเบียน</a></li>
+          <li><a href="my-events.html">กิจกรรมของฉัน <span class="nav-badge" id="my-count" hidden>0</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <p class="sample-banner" id="sample-banner" hidden>
+    ข้อมูลบนเว็บนี้เป็นข้อมูลตัวอย่าง ยังไม่ใช่ข้อมูลจริงจากชมรม
+  </p>
+
+  <main id="main">
+
+    <div class="page-head container">
+      <h1>ลงทะเบียนเข้าร่วมกิจกรรม</h1>
+      <p>ช่องที่มีเครื่องหมาย * ต้องกรอกทุกช่อง ข้อมูลจะถูกเก็บไว้ในเบราว์เซอร์นี้เท่านั้น</p>
+    </div>
+
+    <div class="register-layout container">
+
+      <!-- ===== ฟอร์ม ===== -->
+      <section class="form-card" aria-labelledby="form-title">
+        <h2 id="form-title">ข้อมูลผู้ลงทะเบียน</h2>
+
+        <!-- [JS] กล่องแจ้งผลเมื่อลงทะเบียนสำเร็จ
+             tabindex="-1" ทำให้ JS ย้ายโฟกัสมาที่กล่องนี้ได้ โปรแกรมอ่านหน้าจอจะอ่านข้อความทันที -->
+        <div class="form-success" id="form-success" tabindex="-1" hidden></div>
+
+        <!-- [JS] สรุปข้อผิดพลาดด้านบนฟอร์ม เมื่อกดส่งแล้วมีช่องที่ยังไม่ถูกต้อง -->
+        <p class="form-alert" id="form-alert" role="alert" hidden></p>
+
+        <form id="register-form" novalidate>
+
+          <!-- กิจกรรม: <select> เหมาะเพราะผู้ใช้เลือกจากรายการที่มีอยู่แล้ว ไม่ต้องพิมพ์เอง -->
+          <div class="field">
+            <label for="event">กิจกรรม *</label>
+            <!-- aria-describedby ผูกข้อความแสดงข้อผิดพลาดกับช่อง โปรแกรมอ่านหน้าจอจะอ่านต่อจากชื่อช่อง -->
+            <select id="event" name="event" required aria-describedby="event-error">
+              <option value="">กำลังโหลดกิจกรรม…</option>
+            </select>
+            <p class="field-error" id="event-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="full-name">ชื่อ–สกุล *</label>
+            <!-- autocomplete="name" ให้เบราว์เซอร์เติมชื่อให้ได้ (ช่วยผู้ใช้และได้คะแนน accessibility) -->
+            <input type="text" id="full-name" name="fullName" required minlength="4" maxlength="100"
+                   autocomplete="name" aria-describedby="full-name-error">
+            <p class="field-error" id="full-name-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="student-id">รหัสนักศึกษา *</label>
+            <!-- TODO(กลุ่ม): แก้ pattern และข้อความ hint ให้ตรงกับรูปแบบรหัสนักศึกษาของมหาวิทยาลัยเรา
+                 ตอนนี้ตั้งไว้เป็น "ตัวเลข 10 หลัก" ([0-9]{10})
+                 register.js อ่าน pattern จาก attribute นี้โดยตรง แก้ที่นี่ที่เดียวพอ
+
+                 inputmode="numeric" = มือถือแสดงแป้นตัวเลข
+                 ใช้ type="text" ไม่ใช้ type="number" เพราะรหัสอาจขึ้นต้นด้วย 0 และไม่ใช่ตัวเลขที่เอาไปคำนวณ -->
+            <input type="text" id="student-id" name="studentId" required pattern="[0-9]{10}"
+                   inputmode="numeric" maxlength="10" autocomplete="off"
+                   aria-describedby="student-id-hint student-id-error">
+            <p class="field-hint" id="student-id-hint">ตัวเลข 10 หลัก ไม่ต้องใส่ขีด</p>
+            <p class="field-error" id="student-id-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="email">อีเมล *</label>
+            <!-- type="email" เบราว์เซอร์ตรวจรูปแบบอีเมลให้ และมือถือแสดงแป้นที่มี @ -->
+            <input type="email" id="email" name="email" required autocomplete="email"
+                   aria-describedby="email-error">
+            <p class="field-error" id="email-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="faculty">คณะ *</label>
+            <!-- TODO(กลุ่ม): แก้รายชื่อคณะให้ตรงกับมหาวิทยาลัยของเรา -->
+            <select id="faculty" name="faculty" required aria-describedby="faculty-error">
+              <option value="">เลือกคณะ</option>
+              <option>คณะวิทยาศาสตร์</option>
+              <option>คณะวิศวกรรมศาสตร์</option>
+              <option>คณะเทคโนโลยีสารสนเทศ</option>
+              <option>คณะบริหารธุรกิจ</option>
+              <option>คณะมนุษยศาสตร์และสังคมศาสตร์</option>
+              <option>คณะครุศาสตร์</option>
+              <option>คณะพยาบาลศาสตร์</option>
+              <option>คณะศิลปกรรมศาสตร์</option>
+            </select>
+            <p class="field-error" id="faculty-error"></p>
+          </div>
+
+          <div class="field field-check">
+            <input type="checkbox" id="accept" name="accept" required aria-describedby="accept-error">
+            <label for="accept">
+              ยินยอมให้ชมรมใช้ชื่อ รหัสนักศึกษา และอีเมลเพื่อเช็กชื่อและบันทึกชั่วโมงกิจกรรม
+              และจะแจ้งยกเลิกล่วงหน้าหากไม่สามารถเข้าร่วมได้ *
+            </label>
+            <p class="field-error" id="accept-error"></p>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">ลงทะเบียน</button>
+        </form>
+      </section>
+
+      <!-- ===== สรุปกิจกรรมที่เลือก (F5 ที่นั่งคงเหลือ) =====
+           <aside> = เนื้อหาเสริมที่เกี่ยวข้องกับเนื้อหาหลัก -->
+      <aside class="event-summary" aria-labelledby="summary-title">
+        <h2 id="summary-title">กิจกรรมที่เลือก</h2>
+        <!-- [JS] เปลี่ยนตามกิจกรรมที่เลือกในฟอร์ม aria-live ให้อ่านที่นั่งคงเหลือเมื่อเปลี่ยน -->
+        <div id="event-summary" aria-live="polite">
+          <p class="muted">เลือกกิจกรรมเพื่อดูรายละเอียดและที่นั่งคงเหลือ</p>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-title">Club &amp; Events Hub</p>
+      <p>
+        งาน Mini Project รายวิชา SC17332 กลุ่มที่ 3 ข้อมูลกิจกรรมรวบรวมจากชมรมในมหาวิทยาลัย
+        ดูแหล่งที่มาของข้อมูลได้ใน
+        <a href="https://github.com/">README ของโปรเจกต์</a>
+      </p>
+    </div>
+  </footer>
+
+  <div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+  <!-- JavaScript: ทุกหน้าโหลดครบทุกไฟล์ เพื่อให้ router.js สลับหน้าได้โดยไม่โหลดใหม่
+       ลำดับสำคัญ: common.js ก่อน (ฟังก์ชันที่ใช้ร่วม) → ไฟล์ของแต่ละหน้า → router.js ท้ายสุด (เริ่มทำงาน) -->
+  <script src="js/common.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/clubs.js"></script>
+  <script src="js/register.js"></script>
+  <script src="js/my-events.js"></script>
+  <script src="js/router.js"></script>
+</body>
+</html>

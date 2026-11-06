@@ -1,0 +1,1430 @@
+/* =========================================================
+   style.css — Club & Events Hub (ใช้ร่วมกันทุกหน้า)
+   รายวิชา SC17332 · Mini Project Smart Campus · กลุ่มที่ 3
+
+   แนวคิดดีไซน์: การ์ดกิจกรรมทำเป็น "ตั๋ว" มีต้นขั้วบอกวันที่ด้านซ้าย
+   คั่นด้วยเส้นประและรอยเจาะครึ่งวงกลม สื่อถึงการลงทะเบียน/จองที่นั่ง
+
+   เขียนแบบ mobile-first (ข้อ T5)
+     สไตล์พื้นฐาน = จอมือถือ (360px ขึ้นไป)
+     @media (min-width: 640px)  = แท็บเล็ต   (จุดเปลี่ยนที่ 1)
+     @media (min-width: 1024px) = เดสก์ท็อป  (จุดเปลี่ยนที่ 2)
+
+   สารบัญ (ค้นด้วย Ctrl+F ตามเลข)
+     1) ตัวแปร            2) พื้นฐาน + การเข้าถึง   3) Header / เมนู
+     4) ปุ่มและลิงก์        5) Hero + นับถอยหลัง      6) หัวข้อและ section
+     7) การ์ดกิจกรรม (ตั๋ว)  8) ตัวกรอง               9) ปฏิทิน
+     10) ชมรม             11) ฟอร์มลงทะเบียน        12) กิจกรรมของฉัน
+     13) Footer + แจ้งเตือน  14) Responsive           15) เปลี่ยนหน้า
+     16) ลดการเคลื่อนไหว
+   ========================================================= */
+
+
+/* ---------- 1) ตัวแปร (ข้อ T4: ใช้ CSS custom properties สำหรับสีหลัก) ---------- */
+:root {
+  --paper: #f2f4f8;          /* พื้นหลังทั้งหน้า (เทาอมฟ้า) */
+  --surface: #ffffff;        /* พื้นการ์ด */
+  --ink: #18223d;            /* ตัวอักษรหลัก (กรมท่า) */
+  --ink-soft: #4a5571;       /* ตัวอักษรรอง (contrast กับพื้น paper ≈ 7:1) */
+  --line: #d8dde7;           /* เส้นขอบบาง */
+  --field-line: #737d93;     /* ขอบช่องกรอก (ต้อง contrast ≥ 3:1 กับพื้นขาว) */
+
+  --accent: #4b2dbf;         /* สีหลัก (ม่วง) ตัวอักษรขาวบนสีนี้ contrast ≈ 9:1 */
+  --accent-hover: #391f9c;
+  --accent-soft: #ece7ff;
+  --highlight: #ffd84d;      /* เหลืองไฮไลต์ ใช้กับป้าย "นับชั่วโมงได้" */
+
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --success: #146c3f;
+  --success-soft: #e3f4ea;
+
+  /* สีประจำประเภทกิจกรรม: --tint = พื้น, --tint-ink = ตัวอักษรบนพื้นนั้น
+     ค่าเริ่มต้น (ประเภทอื่น ๆ) ตั้งไว้ที่นี่ ส่วนแต่ละประเภทกำหนดในข้อ 7 */
+  --tint: #e8e5f4;
+  --tint-ink: #3e3470;
+
+  /* ใช้ฟอนต์เดียวทั้งเว็บ อยากเปลี่ยนฟอนต์แก้ 2 บรรทัดนี้ + ลิงก์ Google Fonts ใน <head> */
+  --font-display: "Noto Sans Thai", sans-serif;
+  --font-body: "Noto Sans Thai", sans-serif;
+
+  --radius: 14px;
+  --radius-lg: 20px;
+  --pill: 999px;
+  --stub: 78px;              /* ความกว้างต้นขั้วตั๋ว */
+  --max: 1180px;             /* ความกว้างสูงสุดของเนื้อหา */
+}
+
+
+/* ---------- 2) พื้นฐาน + การเข้าถึง ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 140px;   /* เลื่อนไปที่ #anchor แล้วไม่โดน header ที่ติดด้านบนบัง */
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;           /* ภาษาไทยมีสระบน-ล่าง ต้องเว้นบรรทัดมากกว่าภาษาอังกฤษ */
+  color: var(--ink);
+  background: var(--paper);
+}
+
+h1, h2, h3, p, ul, ol, dl, dd {
+  margin: 0;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  line-height: 1.3;
+}
+
+ul, ol {
+  padding: 0;
+  list-style: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+/* กล่องจัดกึ่งกลาง ใช้ซ้ำทุกส่วน */
+.container {
+  width: min(100% - 32px, var(--max));
+  margin-inline: auto;
+}
+
+/* ซ่อนจากสายตา แต่โปรแกรมอ่านหน้าจอยังอ่านได้ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* วงโฟกัสเมื่อใช้คีย์บอร์ด (ข้อ T3: มองเห็น focus ชัดเจน)
+   :focus-visible แสดงเฉพาะตอนกด Tab ไม่แสดงตอนคลิกเมาส์ */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ลิงก์ข้ามเมนู ซ่อนอยู่นอกจอ โผล่มาเมื่อได้รับโฟกัส */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 300;
+  padding: 10px 18px;
+  border-radius: var(--pill);
+  background: var(--ink);
+  color: #fff;
+  font-weight: 600;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+.muted {
+  color: var(--ink-soft);
+}
+
+/* hidden ต้องชนะ display ที่ตั้งไว้ใน class อื่นเสมอ */
+[hidden] {
+  display: none !important;
+}
+
+
+/* ---------- 3) Header / เมนู ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(242, 244, 248, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Flexbox: โลโก้ + เมนูเรียงแนวนอน ถ้าที่ไม่พอให้ขึ้นบรรทัดใหม่ */
+.header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 24px;
+  padding-top: 12px;
+}
+
+.logo {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* มือถือ: เมนูเต็มความกว้าง เลื่อนซ้าย-ขวาได้ในแถบเมนูเท่านั้น (หน้าเว็บไม่ scroll แนวนอน) */
+.site-header nav {
+  width: 100%;
+}
+
+.nav-links {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-block: 6px 10px;
+  white-space: nowrap;
+  scrollbar-width: thin;
+}
+
+.nav-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;            /* พื้นที่กดอย่างน้อย 44px สำหรับนิ้ว */
+  padding: 0 14px;
+  border-radius: var(--pill);
+  color: var(--ink-soft);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav-links a:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* หน้าปัจจุบัน: เลือกจาก aria-current ไม่ต้องเพิ่ม class เอง */
+.nav-links a[aria-current="page"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.nav-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--pill);
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.sample-banner {
+  padding: 8px 16px;
+  border-bottom: 1px solid #e9d27a;
+  background: #fff4c2;
+  color: var(--ink);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+
+/* ---------- 4) ปุ่มและลิงก์ ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 22px;
+  border: 2px solid transparent;
+  border-radius: var(--pill);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-ghost {
+  border-color: var(--ink);
+  background: transparent;
+  color: var(--ink);
+}
+
+.btn-ghost:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+.btn-danger {
+  border-color: var(--danger);
+  background: transparent;
+  color: var(--danger);
+}
+
+.btn-danger:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn-small {
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 0.92rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.text-link {
+  font-weight: 600;
+}
+
+.text-link:hover {
+  color: var(--accent-hover);
+}
+
+/* ปุ่มที่หน้าตาเหมือนลิงก์ (ใช้ในข้อความ "ลองอีกครั้ง") */
+.link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.icon-btn:hover {
+  border-color: var(--ink);
+}
+
+
+/* ---------- 5) Hero + นับถอยหลัง ---------- */
+/* Grid: มือถือ 1 คอลัมน์ (ข้อความอยู่บน กล่องนับถอยหลังอยู่ล่าง) เดสก์ท็อปแบ่ง 2 คอลัมน์ (ข้อ 14) */
+.hero {
+  display: grid;
+  gap: 28px;
+  padding-block: 32px 8px;
+}
+
+.hero h1 {
+  font-size: clamp(1.9rem, 6.5vw, 3.3rem);   /* ขนาดยืดตามความกว้างจอ แต่ไม่เล็ก/ใหญ่เกินช่วงนี้ */
+  font-weight: 700;
+  line-height: 1.35;         /* ภาษาไทยมีวรรณยุกต์ด้านบน ถ้าน้อยกว่านี้บรรทัดจะชนกัน */
+}
+
+.hero-lead {
+  max-width: 34em;
+  margin-top: 14px;
+  color: var(--ink-soft);
+  font-size: 1.08rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* กล่องนับถอยหลัง: จุดเด่นเดียวของหน้า ใช้พื้นสีเข้ม */
+.countdown-card {
+  padding: 22px 22px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--ink);
+  color: #fff;
+}
+
+.countdown-card a {
+  color: #fff;
+}
+
+/* บนพื้นเข้ม วงโฟกัสสีม่วงมองไม่เห็น จึงเปลี่ยนเป็นสีเหลือง */
+.countdown-card :focus-visible {
+  outline-color: var(--highlight);
+}
+
+.countdown-label {
+  color: #c9cff0;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.countdown-title {
+  margin-top: 6px;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.countdown-title a {
+  text-decoration: none;
+}
+
+.countdown-title a:hover {
+  text-decoration: underline;
+}
+
+.countdown-when {
+  margin-top: 4px;
+  color: #d5daf0;
+  font-size: 0.95rem;
+}
+
+/* ตัวเลข 3 ช่อง (วัน ชั่วโมง นาที) จัดด้วย Grid */
+.timer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 2px dashed rgba(255, 255, 255, 0.28);   /* เส้นประแบบรอยฉีกตั๋ว */
+}
+
+.timer-part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.timer-num {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 11vw, 3.4rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;   /* ตัวเลขกว้างเท่ากัน ไม่กระตุกตอนเปลี่ยนค่า */
+  line-height: 1.1;
+}
+
+.timer-unit {
+  color: #c9cff0;
+  font-size: 0.88rem;
+}
+
+.countdown-status {
+  margin-top: 10px;
+  color: #d5daf0;
+}
+
+.countdown-foot {
+  margin-top: 16px;
+}
+
+.countdown-foot .btn {
+  border-color: #fff;
+  color: #fff;
+}
+
+.countdown-foot .btn:hover {
+  background: #fff;
+  color: var(--ink);
+}
+
+
+/* ---------- 6) หัวข้อและ section ---------- */
+.page-head {
+  padding-block: 32px 4px;
+}
+
+.page-head h1 {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  font-weight: 700;
+}
+
+.page-head p {
+  max-width: 44em;
+  margin-top: 6px;
+  color: var(--ink-soft);
+}
+
+.section {
+  padding-block: 36px 8px;
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-bottom: 18px;
+}
+
+.section-head h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.count-pill {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  margin-left: 6px;
+  padding: 0 8px;
+  border-radius: var(--pill);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+/* ข้อความแทนการ์ด: กำลังโหลด / ไม่พบ / ผิดพลาด */
+.grid-message {
+  grid-column: 1 / -1;
+  padding: 40px 16px;
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+/* ลิงก์ประเภทกิจกรรมในหน้าแรก */
+.type-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+  padding-bottom: 40px;
+}
+
+.type-links a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 18px 20px;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  background: var(--tint);
+  color: var(--tint-ink);
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+
+.type-links a:hover {
+  border-color: var(--tint-ink);
+}
+
+.type-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.type-count {
+  font-size: 0.92rem;
+}
+
+
+/* ---------- 7) การ์ดกิจกรรม (ตั๋ว) ---------- */
+/* สีประจำประเภท: เลือกจาก data-type ที่ JS ใส่ให้การ์ด เช่น data-type="กีฬา"
+   ไม่ได้สื่อความหมายด้วยสีอย่างเดียว (ข้อ T3) เพราะมีชื่อประเภทเป็นตัวอักษรในป้ายด้วยเสมอ */
+[data-type="วิชาการ"]      { --tint: #dde7ff; --tint-ink: #1d3e8a; }
+[data-type="กีฬา"]         { --tint: #ffe2c7; --tint-ink: #833800; }
+[data-type="จิตอาสา"]      { --tint: #d3f0de; --tint-ink: #155c37; }
+[data-type="ศิลปวัฒนธรรม"] { --tint: #f8dcec; --tint-ink: #84204e; }
+
+/* auto-fill + minmax: จำนวนคอลัมน์ปรับเองตามความกว้าง (มือถือ 1, แท็บเล็ต 2, เดสก์ท็อป 3)
+   min(100%, 300px) กันการ์ดกว้างเกินจอที่แคบกว่า 300px */
+.ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+  gap: 20px;
+}
+
+.ticket {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--stub) minmax(0, 1fr);   /* ต้นขั้ว | เนื้อหา */
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transition: border-color 0.2s;
+}
+
+.ticket:hover {
+  border-color: #aab2c5;
+}
+
+/* รอยเจาะครึ่งวงกลมบน-ล่าง ตรงแนวเส้นประ
+   วาดวงกลมสีเดียวกับพื้นหลังหน้า แล้วใช้ clip-path ตัดให้เหลือครึ่งที่อยู่ในการ์ด */
+.ticket::before,
+.ticket::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--stub) - 10px);
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.ticket::before {
+  top: -11px;
+  clip-path: inset(50% 0 0 0);
+}
+
+.ticket::after {
+  bottom: -11px;
+  clip-path: inset(0 0 50% 0);
+}
+
+/* กิจกรรมที่จบแล้ว: ต้นขั้วเป็นสีเทา (มีป้าย "จบแล้ว" เป็นตัวอักษรด้วย) */
+.ticket.is-past {
+  --tint: #e4e7ee;
+  --tint-ink: #3d4660;
+}
+
+/* การ์ดที่ถูกลิงก์มาถึง (#event-e006) หรือกดจากปฏิทิน */
+.ticket:target,
+.ticket.is-highlight {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.ticket-stub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 16px 4px;
+  border-right: 2px dashed rgba(24, 34, 61, 0.22);
+  border-radius: var(--radius) 0 0 var(--radius);
+  background: var(--tint);
+  color: var(--tint-ink);
+  text-align: center;
+}
+
+.stub-month {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.stub-day {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stub-weekday {
+  font-size: 0.8rem;
+}
+
+.ticket-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;                /* ให้ข้อความยาวตัดบรรทัดได้ ไม่ดันการ์ดล้น */
+  padding: 16px 18px 18px;
+}
+
+.ticket-poster {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.ticket-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--pill);
+  background: var(--tint);
+  color: var(--tint-ink);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.chip-hours {
+  background: var(--highlight);
+  color: var(--ink);
+}
+
+.chip-status {
+  background: #e4e7ee;
+  color: #3d4660;
+}
+
+.chip-full {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.ticket h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ticket-club {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+/* รายละเอียด วันที่/เวลา/สถานที่ ใช้ <dl> (คำ + ความหมาย) จัดเป็น Grid 2 คอลัมน์ */
+.ticket-meta {
+  display: grid;
+  gap: 2px;
+  font-size: 0.92rem;
+}
+
+.ticket-meta div {
+  display: grid;
+  grid-template-columns: 4.6em minmax(0, 1fr);
+  gap: 8px;
+}
+
+.ticket-meta dt {
+  color: var(--ink-soft);
+}
+
+.seats {
+  display: grid;
+  gap: 4px;
+}
+
+.seat-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--pill);
+  background: #e3e6ee;
+}
+
+.seat-fill {
+  width: 0;                    /* JS ตั้งความกว้างจริงตามสัดส่วนที่นั่งที่ใช้ไป */
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.4s;
+}
+
+.ticket.is-low .seat-fill {
+  background: #c2410c;
+}
+
+.seat-text {
+  font-size: 0.88rem;
+}
+
+.ticket-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;            /* ดันปุ่มลงล่างสุด การ์ดในแถวเดียวกันปุ่มจะตรงกัน */
+  padding-top: 4px;
+}
+
+.ticket-note {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+
+/* ---------- 8) ตัวกรอง ---------- */
+.filters {
+  padding-top: 20px;
+}
+
+/* Grid: มือถือ 1 คอลัมน์ แท็บเล็ต 2 คอลัมน์ เดสก์ท็อปเรียงแถวเดียว (ข้อ 14) */
+.filter-form {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.filter-form .field {
+  margin-bottom: 0;
+}
+
+.filter-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 14px;
+}
+
+.result-count {
+  color: var(--ink-soft);
+}
+
+.view-toggle {
+  display: inline-flex;
+  padding: 3px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--pill);
+}
+
+.view-toggle button {
+  min-height: 38px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--pill);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.view-toggle button[aria-pressed="true"] {
+  background: var(--ink);
+  color: #fff;
+}
+
+.section-past .section-head h2 {
+  color: var(--ink-soft);
+}
+
+
+/* ---------- 9) ปฏิทิน (ฟีเจอร์เสริม: CSS Grid 7 คอลัมน์) ---------- */
+.calendar {
+  padding-block: 28px 40px;
+}
+
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.cal-head h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* หัวใจของปฏิทิน: 7 คอลัมน์เท่ากัน = 7 วันในสัปดาห์
+   minmax(0, 1fr) กันไม่ให้ชื่อกิจกรรมยาว ๆ ดันคอลัมน์ให้กว้างเกิน */
+.cal-weekdays,
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.cal-weekdays {
+  margin-bottom: 4px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.cal-day {
+  min-width: 0;
+  min-height: 62px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+/* ช่องว่างก่อนวันที่ 1 ของเดือน */
+.cal-empty {
+  border: 0;
+  background: transparent;
+}
+
+.cal-day[aria-current="date"] {
+  border: 2px solid var(--accent);
+}
+
+.cal-date {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.cal-events {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+/* มือถือ: กิจกรรมแสดงเป็นจุดสี ชื่อกิจกรรมซ่อนจากสายตาแต่ยังอ่านได้ด้วยโปรแกรมอ่านหน้าจอ */
+.cal-events a {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--tint-ink);
+}
+
+.cal-event-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.cal-note {
+  margin-top: 12px;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+
+/* ---------- 10) ชมรม ---------- */
+.club-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 20px;
+  padding-block: 24px 48px;
+}
+
+.club {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-top: 6px solid var(--tint-ink);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.club h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.club-contact {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.club h3 {
+  margin-top: 4px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.club-events {
+  display: grid;
+  gap: 8px;
+}
+
+.club-events li {
+  display: grid;
+  grid-template-columns: 4.8em minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.club-events time {
+  color: var(--tint-ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.club-foot {
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+
+/* ---------- 11) ฟอร์มลงทะเบียน ---------- */
+.register-layout {
+  display: grid;
+  gap: 24px;
+  padding-block: 24px 56px;
+}
+
+.form-card,
+.event-summary {
+  padding: 22px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.form-card h2,
+.event-summary h2 {
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.field label {
+  font-weight: 600;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="search"],
+.field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--field-line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  transition: border-color 0.2s;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--accent);
+}
+
+/* ช่องที่ JS ตรวจแล้วไม่ผ่าน (aria-invalid="true"): ขอบแดง + ข้อความแดงใต้ช่อง */
+.field [aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.field-hint {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* ไม่มีข้อความผิดพลาด = ไม่ต้องกินพื้นที่ */
+.field-error:empty {
+  display: none;
+}
+
+/* checkbox อยู่ซ้าย ข้อความอยู่ขวา ข้อความผิดพลาดขึ้นบรรทัดใหม่เต็มความกว้าง */
+.field-check {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.field-check input {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+}
+
+.field-check label {
+  flex: 1;
+  font-weight: 400;
+}
+
+.field-check .field-error {
+  width: 100%;
+}
+
+.form-alert {
+  margin-bottom: 18px;
+  padding: 12px 16px;
+  border-left: 4px solid var(--danger);
+  border-radius: 8px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.form-success {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border-left: 4px solid var(--success);
+  border-radius: 8px;
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.form-success h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.form-success p {
+  margin-top: 4px;
+  color: var(--ink);
+}
+
+.form-success .btn {
+  margin-top: 12px;
+}
+
+.summary-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.summary-body {
+  display: grid;
+  gap: 10px;
+}
+
+.summary-desc {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.seat-big {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+
+/* ---------- 12) กิจกรรมของฉัน ---------- */
+.my-top {
+  display: grid;
+  gap: 20px;
+  padding-top: 24px;
+}
+
+.hours-card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.hours-card h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.hours-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.hours-stat {
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.hours-stat strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.hours-stat-done {
+  background: var(--highlight);
+}
+
+.hours-note {
+  margin-top: 12px;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+.my-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+  gap: 20px;
+  padding-bottom: 32px;
+}
+
+.my-reg {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+
+/* ---------- 13) Footer + แจ้งเตือน ---------- */
+.site-footer {
+  margin-top: 40px;
+  padding-block: 36px;
+  background: var(--ink);
+  color: #d5dbe8;
+}
+
+.footer-inner {
+  display: grid;
+  gap: 8px;
+}
+
+.footer-title {
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.site-footer a {
+  color: #fff;
+}
+
+.site-footer :focus-visible {
+  outline-color: var(--highlight);
+}
+
+.notice {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  z-index: 200;
+  max-width: calc(100% - 32px);
+  padding: 12px 22px;
+  border-radius: var(--pill);
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(24, 34, 61, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 16px);
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.notice.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+
+/* ---------- 14) Responsive ---------- */
+
+/* จุดเปลี่ยนที่ 1: แท็บเล็ต (กว้าง 640px ขึ้นไป) */
+@media (min-width: 640px) {
+  :root {
+    --stub: 88px;
+  }
+
+  .filter-form {
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+  }
+
+  .field-search {
+    grid-column: 1 / -1;       /* ช่องค้นหากินเต็มแถว */
+  }
+
+  .filter-form .field-check {
+    align-items: center;
+    min-height: 46px;
+  }
+
+  .hours-stats {
+    gap: 16px;
+  }
+
+  /* ปฏิทิน: จอกว้างพอแล้ว แสดงชื่อกิจกรรมแทนจุด */
+  .cal-day {
+    min-height: 96px;
+    padding: 6px;
+  }
+
+  /* minmax(0, 1fr) + min-width: 0 ให้ชื่อกิจกรรมยาว ๆ ถูกตัดด้วย … แทนที่จะดันล้นช่อง */
+  .cal-events {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+  }
+
+  .cal-events li {
+    min-width: 0;
+  }
+
+  .cal-events a {
+    width: auto;
+    height: auto;
+    overflow: hidden;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--tint);
+    color: var(--tint-ink);
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cal-events a:hover {
+    text-decoration: underline;
+  }
+
+  .cal-event-text {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+  }
+}
+
+/* จุดเปลี่ยนที่ 2: เดสก์ท็อป (กว้าง 1024px ขึ้นไป) */
+@media (min-width: 1024px) {
+  html {
+    scroll-padding-top: 100px;
+  }
+
+  /* เมนูอยู่บรรทัดเดียวกับโลโก้ */
+  .header-inner {
+    flex-wrap: nowrap;
+    padding-block: 10px;
+  }
+
+  .site-header nav {
+    width: auto;
+  }
+
+  .nav-links {
+    padding-block: 0;
+    overflow: visible;
+  }
+
+  .hero {
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: center;
+    gap: 56px;
+    padding-block: 56px 16px;
+  }
+
+  .countdown-card {
+    padding: 28px 28px 30px;
+  }
+
+  .filter-form {
+    grid-template-columns: 2fr 1fr 1fr auto auto;
+  }
+
+  .field-search {
+    grid-column: auto;
+  }
+
+  .register-layout {
+    grid-template-columns: 1.4fr 1fr;
+    align-items: start;
+  }
+
+  /* กล่องสรุปกิจกรรมติดหน้าจอขณะเลื่อนกรอกฟอร์ม */
+  .event-summary {
+    position: sticky;
+    top: 96px;
+  }
+
+  .form-card,
+  .event-summary {
+    padding: 28px;
+  }
+
+  .my-top {
+    grid-template-columns: 1.3fr 1fr;
+  }
+
+  .cal-day {
+    min-height: 116px;
+  }
+}
+
+
+/* ---------- 15) เปลี่ยนหน้าแบบไม่โหลดใหม่ (router.js) ----------
+   router.js สร้าง <main> ใหม่ทุกครั้งที่เปลี่ยนหน้า animation จึงเล่นทุกครั้งเอง
+   ค่อย ๆ ปรากฏ 0.2 วินาที ให้รู้ว่าเนื้อหาเปลี่ยนแล้ว */
+main {
+  animation: page-in 0.2s ease-out;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+
+/* ---------- 16) ผู้ใช้ที่ตั้งค่าลดการเคลื่อนไหว ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

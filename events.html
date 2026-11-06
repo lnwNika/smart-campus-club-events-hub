@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<!--
+  =========================================================
+  events.html — กิจกรรมทั้งหมด
+  ฟีเจอร์: F1 (fetch + สร้างการ์ด), F2 (เรียงตามวันที่ แยกกำลังจะมาถึง/ผ่านไปแล้ว),
+          F3 (ค้นหา + กรองตามประเภท ชมรม และชั่วโมงกิจกรรม),
+          ฟีเจอร์เสริม: ปฏิทินรายเดือน (CSS Grid) และปุ่มแชร์ (Clipboard API)
+  JavaScript: js/events.js (เริ่มทำงานผ่าน js/router.js)
+
+  รับค่าจาก URL ได้ เช่น
+    events.html?type=จิตอาสา     → เลือกประเภทให้ล่วงหน้า (ลิงก์จากหน้าแรก)
+    events.html?club=c01         → เลือกชมรมให้ล่วงหน้า (ลิงก์จากหน้าชมรม)
+    events.html#event-e006       → เลื่อนไปที่การ์ดกิจกรรมนั้น (ลิงก์จากปุ่มแชร์)
+  =========================================================
+-->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>กิจกรรมทั้งหมด — Club &amp; Events Hub</title>
+  <meta name="description" content="ค้นหาและกรองกิจกรรมชมรมตามประเภท ชมรม และกิจกรรมที่นับชั่วโมงได้">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="events">
+
+  <a class="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">Club &amp; Events Hub</a>
+      <nav aria-label="เมนูหลัก">
+        <ul class="nav-links">
+          <li><a href="index.html">หน้าแรก</a></li>
+          <li><a href="events.html" aria-current="page">กิจกรรมทั้งหมด</a></li>
+          <li><a href="clubs.html">ชมรม</a></li>
+          <li><a href="register.html">ลงทะเบียน</a></li>
+          <li><a href="my-events.html">กิจกรรมของฉัน <span class="nav-badge" id="my-count" hidden>0</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <p class="sample-banner" id="sample-banner" hidden>
+    ข้อมูลบนเว็บนี้เป็นข้อมูลตัวอย่าง ยังไม่ใช่ข้อมูลจริงจากชมรม
+  </p>
+
+  <main id="main">
+
+    <div class="page-head container">
+      <h1>กิจกรรมทั้งหมด</h1>
+      <p>กิจกรรมเรียงตามวันที่ กิจกรรมที่จบแล้วแยกไว้ด้านล่าง</p>
+    </div>
+
+    <!-- ===== ค้นหาและตัวกรอง (F3) ===== -->
+    <section class="filters container" aria-labelledby="filter-title">
+      <!-- หัวข้อนี้ซ่อนจากสายตา แต่โปรแกรมอ่านหน้าจออ่านได้ ทำให้ลำดับ heading ไม่ข้ามจาก h1 ไป h3 -->
+      <h2 id="filter-title" class="visually-hidden">ค้นหาและกรองกิจกรรม</h2>
+
+      <!-- role="search" = ฟอร์มนี้คือส่วนค้นหา
+           JS กรองทันทีที่พิมพ์หรือเปลี่ยนค่า (event "input") และกัน submit ไม่ให้โหลดหน้าใหม่ -->
+      <form class="filter-form" id="filter-form" role="search">
+        <div class="field field-search">
+          <label for="q">ค้นหา</label>
+          <input type="search" id="q" name="q" placeholder="ชื่อกิจกรรม สถานที่ หรือชมรม" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="type">ประเภท</label>
+          <!-- [JS] option ประเภทสร้างจากข้อมูลจริง -->
+          <select id="type" name="type">
+            <option value="">ทุกประเภท</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="club">ชมรม</label>
+          <!-- [JS] option ชมรมสร้างจาก clubs ในข้อมูล -->
+          <select id="club" name="club">
+            <option value="">ทุกชมรม</option>
+          </select>
+        </div>
+
+        <div class="field field-check">
+          <input type="checkbox" id="hours-only" name="hours">
+          <label for="hours-only">เฉพาะที่นับชั่วโมงกิจกรรมได้</label>
+        </div>
+
+        <button type="button" class="btn btn-ghost btn-small" id="clear-filters">ล้างตัวกรอง</button>
+      </form>
+
+      <div class="filter-foot">
+        <!-- [JS] aria-live="polite" ให้โปรแกรมอ่านหน้าจอบอกจำนวนผลลัพธ์ทุกครั้งที่กรอง -->
+        <p class="result-count" id="result-count" aria-live="polite"></p>
+
+        <!-- ปุ่มสลับมุมมอง aria-pressed บอกว่าปุ่มไหนถูกเลือกอยู่ (JS เปลี่ยนค่าให้) -->
+        <div class="view-toggle" role="group" aria-label="รูปแบบการแสดงผล">
+          <button type="button" data-view="list" aria-pressed="true">รายการ</button>
+          <button type="button" data-view="calendar" aria-pressed="false">ปฏิทิน</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== มุมมองรายการ (F2) ===== -->
+    <div id="list-view" class="container">
+      <section class="section" aria-labelledby="upcoming-title">
+        <div class="section-head">
+          <h2 id="upcoming-title">กำลังจะมาถึง</h2>
+        </div>
+        <div class="ticket-grid" id="upcoming-grid" aria-busy="true">
+          <p class="grid-message">กำลังโหลดกิจกรรม…</p>
+        </div>
+      </section>
+
+      <section class="section section-past" aria-labelledby="past-title">
+        <div class="section-head">
+          <h2 id="past-title">ผ่านไปแล้ว</h2>
+        </div>
+        <div class="ticket-grid" id="past-grid"></div>
+      </section>
+
+      <noscript>
+        <p class="grid-message">กรุณาเปิดใช้ JavaScript เพื่อดูรายการกิจกรรม</p>
+      </noscript>
+    </div>
+
+    <!-- ===== มุมมองปฏิทิน (ฟีเจอร์เสริม) =====
+         ซ่อนไว้ก่อนด้วย hidden จนกว่าผู้ใช้กดปุ่ม "ปฏิทิน"
+         ตารางวันใช้ CSS Grid 7 คอลัมน์ (ดู .cal-grid ใน style.css) -->
+    <section id="calendar-view" class="calendar container" aria-labelledby="cal-title" hidden>
+      <div class="cal-head">
+        <button type="button" class="icon-btn" id="cal-prev" aria-label="เดือนก่อนหน้า">‹</button>
+        <!-- [JS] ชื่อเดือน เช่น "พฤศจิกายน 2569" -->
+        <h2 id="cal-title" aria-live="polite">ปฏิทินกิจกรรม</h2>
+        <button type="button" class="icon-btn" id="cal-next" aria-label="เดือนถัดไป">›</button>
+      </div>
+
+      <!-- ชื่อวันเป็นแค่หัวคอลัมน์สำหรับสายตา โปรแกรมอ่านหน้าจอจะได้วันที่เต็มจากแต่ละช่องแทน -->
+      <ol class="cal-weekdays" aria-hidden="true">
+        <li>อา</li><li>จ</li><li>อ</li><li>พ</li><li>พฤ</li><li>ศ</li><li>ส</li>
+      </ol>
+
+      <!-- [JS] ช่องวันของเดือน 1 ช่อง = 1 วัน -->
+      <ol class="cal-grid" id="cal-grid"></ol>
+      <p class="cal-note">กดชื่อกิจกรรมในปฏิทินเพื่อดูรายละเอียดและลงทะเบียน</p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-title">Club &amp; Events Hub</p>
+      <p>
+        งาน Mini Project รายวิชา SC17332 กลุ่มที่ 3 ข้อมูลกิจกรรมรวบรวมจากชมรมในมหาวิทยาลัย
+        ดูแหล่งที่มาของข้อมูลได้ใน
+        <a href="https://github.com/">README ของโปรเจกต์</a>
+      </p>
+    </div>
+  </footer>
+
+  <div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+  <!-- JavaScript: ทุกหน้าโหลดครบทุกไฟล์ เพื่อให้ router.js สลับหน้าได้โดยไม่โหลดใหม่
+       ลำดับสำคัญ: common.js ก่อน (ฟังก์ชันที่ใช้ร่วม) → ไฟล์ของแต่ละหน้า → router.js ท้ายสุด (เริ่มทำงาน) -->
+  <script src="js/common.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/clubs.js"></script>
+  <script src="js/register.js"></script>
+  <script src="js/my-events.js"></script>
+  <script src="js/router.js"></script>
+</body>
+</html>

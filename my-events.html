@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!--
+  =========================================================
+  my-events.html — กิจกรรมของฉัน (F5, F6) + สรุปชั่วโมงกิจกรรม (ฟีเจอร์เสริม)
+  JavaScript: js/my-events.js (เริ่มทำงานผ่าน js/router.js)
+
+  ข้อมูลการลงทะเบียนอ่านจาก localStorage (key "ceh-registrations")
+  แล้วจับคู่กับรายละเอียดกิจกรรมจาก data/events.json ด้วย eventId
+  =========================================================
+-->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>กิจกรรมของฉัน — Club &amp; Events Hub</title>
+  <meta name="description" content="กิจกรรมที่ลงทะเบียนไว้ นับถอยหลัง และสรุปชั่วโมงกิจกรรม">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="my-events">
+
+  <a class="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">Club &amp; Events Hub</a>
+      <nav aria-label="เมนูหลัก">
+        <ul class="nav-links">
+          <li><a href="index.html">หน้าแรก</a></li>
+          <li><a href="events.html">กิจกรรมทั้งหมด</a></li>
+          <li><a href="clubs.html">ชมรม</a></li>
+          <li><a href="register.html">ลงทะเบียน</a></li>
+          <li><a href="my-events.html" aria-current="page">กิจกรรมของฉัน <span class="nav-badge" id="my-count" hidden>0</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <p class="sample-banner" id="sample-banner" hidden>
+    ข้อมูลบนเว็บนี้เป็นข้อมูลตัวอย่าง ยังไม่ใช่ข้อมูลจริงจากชมรม
+  </p>
+
+  <main id="main">
+
+    <div class="page-head container">
+      <h1>กิจกรรมของฉัน</h1>
+      <p>กิจกรรมที่ลงทะเบียนจากเบราว์เซอร์นี้ ถ้าเปลี่ยนเครื่องหรือล้างข้อมูลเบราว์เซอร์ รายการจะหายไป</p>
+    </div>
+
+    <div class="my-top container">
+      <!-- นับถอยหลังถึงกิจกรรมถัดไปของฉัน (F6) ใช้ฟังก์ชันเดียวกับหน้าแรก -->
+      <section class="countdown-card" aria-labelledby="countdown-title">
+        <h2 id="countdown-title" class="countdown-label">กิจกรรมถัดไปของฉัน</h2>
+        <div id="countdown-box" aria-busy="true">
+          <p class="countdown-status">กำลังโหลดกิจกรรม…</p>
+        </div>
+      </section>
+
+      <!-- สรุปชั่วโมงกิจกรรม (ฟีเจอร์เสริม) -->
+      <section class="hours-card" aria-labelledby="hours-title">
+        <h2 id="hours-title">ชั่วโมงกิจกรรม</h2>
+        <!-- [JS] เติมตัวเลขชั่วโมงสะสมและชั่วโมงที่จะได้รับ -->
+        <div id="hours-summary">
+          <p class="muted">กำลังคำนวณ…</p>
+        </div>
+      </section>
+    </div>
+
+    <div class="container">
+      <section class="section" aria-labelledby="my-upcoming-title">
+        <div class="section-head">
+          <!-- tabindex="-1" ให้ JS ย้ายโฟกัสมาที่หัวข้อนี้ได้หลังยกเลิก (ปุ่มที่กดหายไปแล้ว) -->
+          <h2 id="my-upcoming-title" tabindex="-1">ที่ลงทะเบียนไว้</h2>
+          <a class="text-link" href="events.html">หากิจกรรมเพิ่ม</a>
+        </div>
+        <!-- [JS] รายการกิจกรรมที่ยังไม่จบ พร้อมปุ่มยกเลิก (ถามยืนยันก่อน) -->
+        <ul class="my-list" id="my-upcoming" aria-busy="true">
+          <li class="grid-message">กำลังโหลดรายการ…</li>
+        </ul>
+      </section>
+
+      <section class="section section-past" aria-labelledby="my-past-title">
+        <div class="section-head">
+          <h2 id="my-past-title">เข้าร่วมแล้ว</h2>
+        </div>
+        <!-- [JS] กิจกรรมที่จบแล้ว (ยกเลิกไม่ได้) -->
+        <ul class="my-list" id="my-past"></ul>
+      </section>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-title">Club &amp; Events Hub</p>
+      <p>
+        งาน Mini Project รายวิชา SC17332 กลุ่มที่ 3 ข้อมูลกิจกรรมรวบรวมจากชมรมในมหาวิทยาลัย
+        ดูแหล่งที่มาของข้อมูลได้ใน
+        <a href="https://github.com/">README ของโปรเจกต์</a>
+      </p>
+    </div>
+  </footer>
+
+  <div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+  <!-- JavaScript: ทุกหน้าโหลดครบทุกไฟล์ เพื่อให้ router.js สลับหน้าได้โดยไม่โหลดใหม่
+       ลำดับสำคัญ: common.js ก่อน (ฟังก์ชันที่ใช้ร่วม) → ไฟล์ของแต่ละหน้า → router.js ท้ายสุด (เริ่มทำงาน) -->
+  <script src="js/common.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/clubs.js"></script>
+  <script src="js/register.js"></script>
+  <script src="js/my-events.js"></script>
+  <script src="js/router.js"></script>
+</body>
+</html>
