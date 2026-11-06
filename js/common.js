@@ -78,12 +78,6 @@ async function loadData() {
     throw new Error('รูปแบบข้อมูลไม่ถูกต้อง: ต้องมี clubs และ events เป็น array');
   }
 
-  // แสดงแถบเตือนเมื่อยังเป็นข้อมูลตัวอย่าง
-  const banner = document.querySelector('#sample-banner');
-  if (banner !== null && data.meta && data.meta.isSample === true) {
-    banner.hidden = false;
-  }
-
   cachedData = data;
   return data;
 }

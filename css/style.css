@@ -236,15 +236,6 @@ a {
   line-height: 1;
 }
 
-.sample-banner {
-  padding: 8px 16px;
-  border-bottom: 1px solid #e9d27a;
-  background: #fff4c2;
-  color: var(--ink);
-  font-size: 0.9rem;
-  text-align: center;
-}
-
 
 /* ---------- 4) ปุ่มและลิงก์ ---------- */
 .btn {
