@@ -24,17 +24,27 @@ registerPage('clubs', function () {
       return e.clubId === club.id;
     }).length;
 
+    // ไม่มีกิจกรรมที่กำลังจะมาถึง → แสดงกิจกรรมล่าสุดของชมรมแทน (reverse = ล่าสุดก่อน)
+    let shown = upcoming;
+    let listTitle = 'กิจกรรมที่กำลังจะมาถึง';
+    if (shown.length === 0) {
+      shown = sortByStart(events).filter(function (e) {
+        return e.clubId === club.id;
+      }).reverse();
+      listTitle = 'กิจกรรมล่าสุด';
+    }
+
     let list = '';
-    if (upcoming.length === 0) {
-      list = '<p class="muted">ยังไม่มีกิจกรรมที่กำลังจะมาถึง</p>';
+    if (shown.length === 0) {
+      list = '<p class="muted">ยังไม่มีข้อมูลกิจกรรม</p>';
     } else {
       list = '<ul class="club-events">';
       // slice(0, n) = เอาแค่ n ตัวแรก
-      for (const e of upcoming.slice(0, CLUB_EVENT_LIMIT)) {
+      for (const e of shown.slice(0, CLUB_EVENT_LIMIT)) {
         const stub = getStubParts(e.date);
         list += `
           <li>
-            <time datetime="${escapeHtml(e.date)}">${stub.day} ${stub.month}</time>
+            <time datetime="${escapeHtml(e.date)}">${stub.day} ${stub.month} ${stub.year}</time>
             <a href="events.html#event-${escapeHtml(e.id)}">${escapeHtml(e.title)}</a>
           </li>`;
       }
@@ -44,7 +54,7 @@ registerPage('clubs', function () {
     // ช่องทางติดต่อ ถ้ามีลิงก์แหล่งที่มา (source) ให้เป็นลิงก์กดได้
     let contact = escapeHtml(club.contact || '');
     if (club.source) {
-      contact = '<a href="' + escapeHtml(club.source) + '" rel="noopener">' + contact + '</a>';
+      contact = '<a href="' + escapeHtml(club.source) + '" target="_blank" rel="noopener">' + contact + '</a>';
     }
 
     // data-type ทำให้สีขอบบนการ์ดเป็นสีประจำประเภท (กำหนดใน style.css ข้อ 7)
@@ -54,7 +64,7 @@ registerPage('clubs', function () {
         <h2>${escapeHtml(club.name)}</h2>
         <p>${escapeHtml(club.description || '')}</p>
         ${contact ? '<p class="club-contact">ติดต่อ: ' + contact + '</p>' : ''}
-        <h3>กิจกรรมที่กำลังจะมาถึง</h3>
+        <h3>${listTitle}</h3>
         ${list}
         <p class="club-foot">
           <a class="text-link" href="events.html?club=${encodeURIComponent(club.id)}">ดูกิจกรรมทั้งหมดของ${escapeHtml(club.name)} (${total})</a>

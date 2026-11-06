@@ -106,20 +106,21 @@ registerPage('my-events', function () {
   //   จะได้รับเพิ่ม  = ชั่วโมงของกิจกรรมที่ยังไม่จบ
   // reduce() รวมค่าทุกตัวใน array ให้เหลือค่าเดียว (เริ่มจาก 0)
   function renderHours(items) {
-    const done = items
-      .filter(function (item) { return isPast(item.event); })
-      .reduce(function (sum, item) { return sum + item.event.activityHours; }, 0);
-
-    const coming = items
-      .filter(function (item) { return !isPast(item.event); })
-      .reduce(function (sum, item) { return sum + item.event.activityHours; }, 0);
+    // รวมค่าของ field หนึ่งจากรายการที่เลือก (null นับเป็น 0)
+    function total(list, field) {
+      return list.reduce(function (sum, item) { return sum + (item.event[field] || 0); }, 0);
+    }
+    const done = items.filter(function (item) { return isPast(item.event); });
+    const coming = items.filter(function (item) { return !isPast(item.event); });
 
     hoursBox.innerHTML = `
       <div class="hours-stats">
-        <p class="hours-stat hours-stat-done"><strong>${done}</strong> ชั่วโมงที่สะสมแล้ว</p>
-        <p class="hours-stat"><strong>${coming}</strong> ชั่วโมงที่จะได้รับเพิ่ม</p>
+        <p class="hours-stat hours-stat-done"><strong>${total(done, 'activityStamps')}</strong> ตราปั๊มที่สะสมแล้ว</p>
+        <p class="hours-stat"><strong>${total(coming, 'activityStamps')}</strong> ตราปั๊มที่จะได้รับเพิ่ม</p>
+        <p class="hours-stat hours-stat-done"><strong>${total(done, 'activityHours')}</strong> ชั่วโมงที่สะสมแล้ว</p>
+        <p class="hours-stat"><strong>${total(coming, 'activityHours')}</strong> ชั่วโมงที่จะได้รับเพิ่ม</p>
       </div>
-      <p class="hours-note">คำนวณจากกิจกรรมที่ลงทะเบียนในเบราว์เซอร์นี้ ชั่วโมงจริงขึ้นกับการเช็กชื่อของผู้จัดกิจกรรม</p>`;
+      <p class="hours-note">คำนวณจากกิจกรรมที่ลงทะเบียนในเบราว์เซอร์นี้ และนับเฉพาะกิจกรรมที่โพสต์ของชมรมระบุตราปั๊มหรือชั่วโมงไว้ ของจริงขึ้นกับการเช็กชื่อของผู้จัด</p>`;
   }
 
 

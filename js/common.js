@@ -144,12 +144,17 @@ function showLoadError(container, retry) {
 // ข้อมูลเก็บวันที่แบบ "2026-12-05" และเวลาแบบ "13:00"
 // new Date('2026-12-05T13:00') = เวลาท้องถิ่นของเครื่องผู้ใช้ (ไทยคือ UTC+7)
 
+// ข้อมูลจริงบางกิจกรรมไม่ระบุเวลา (start/end เป็น null) หรือจัดหลายวัน (มี endDate)
+//   ไม่ระบุเวลาเริ่ม   → ถือว่าเริ่ม 00:00 ของวันนั้น (ใช้เรียงลำดับ)
+//   ไม่ระบุเวลาจบ     → ถือว่าจบ 23:59 ของวันสุดท้าย (ใช้ตัดสินว่าผ่านไปแล้วหรือยัง)
+//   || = ถ้าค่าซ้ายเป็น null/ว่าง ให้ใช้ค่าขวาแทน
 function getStart(event) {
-  return new Date(event.date + 'T' + event.start);
+  return new Date(event.date + 'T' + (event.start || '00:00'));
 }
 
 function getEnd(event) {
-  return new Date(event.date + 'T' + event.end);
+  const lastDay = event.endDate || event.date;
+  return new Date(lastDay + 'T' + (event.end || '23:59'));
 }
 
 // จบแล้วหรือยัง = เวลาสิ้นสุดผ่านไปแล้ว (กิจกรรมที่กำลังจัดอยู่ยังไม่นับว่าจบ)
@@ -182,9 +187,28 @@ function formatThaiDate(dateText) {
   });
 }
 
-// "13:00", "16:00" → "13:00–16:00 น."
+// วันที่ของกิจกรรม: วันเดียว → "ส. 5 ธ.ค. 2569"   หลายวัน → "จ. 23 ก.พ. 2569 – พ. 25 ก.พ. 2569"
+function formatEventDate(event) {
+  if (event.endDate && event.endDate !== event.date) {
+    return formatThaiDate(event.date) + ' – ' + formatThaiDate(event.endDate);
+  }
+  return formatThaiDate(event.date);
+}
+
+// "13:00", "16:00" → "13:00–16:00 น."   มีแค่เวลาเริ่ม → "เริ่ม 17:00 น."   ไม่มีเลย → "ไม่ระบุเวลา"
 function formatTimeRange(event) {
+  if (!event.start) {
+    return 'ไม่ระบุเวลา';
+  }
+  if (!event.end) {
+    return 'เริ่ม ' + event.start + ' น.';
+  }
   return event.start + '–' + event.end + ' น.';
+}
+
+// มีจำนวนที่นั่งในข้อมูลไหม (โพสต์ส่วนใหญ่ไม่ได้บอก → capacity เป็น null)
+function hasSeatLimit(event) {
+  return typeof event.capacity === 'number';
 }
 
 // ส่วนประกอบของต้นขั้วตั๋ว: { day: 5, month: 'ธ.ค.', weekday: 'ส.' }
@@ -193,7 +217,8 @@ function getStubParts(dateText) {
   return {
     day: date.getDate(),
     month: date.toLocaleDateString('th-TH', { month: 'short' }),
-    weekday: date.toLocaleDateString('th-TH', { weekday: 'short' })
+    weekday: date.toLocaleDateString('th-TH', { weekday: 'short' }),
+    year: String(date.getFullYear() + 543).slice(2)    // ปี พ.ศ. 2 หลักท้าย เช่น 2569 → "69"
   };
 }
 
@@ -246,13 +271,20 @@ function countMyRegistrations(eventId) {
 // หมายเหตุ: localStorage อยู่ในเครื่องผู้ใช้แต่ละคน ไม่มีเซิร์ฟเวอร์กลาง
 // การนับที่นั่งจึงเป็นการ "จำลอง" จากมุมมองของเบราว์เซอร์นี้
 // Math.max(0, ...) กันไม่ให้ติดลบ
+//   ไม่ระบุจำนวนที่นั่ง → คืน null (ไม่จำกัด ลงทะเบียนได้เสมอ)
 function seatsLeft(event) {
-  return Math.max(0, event.capacity - event.registered - countMyRegistrations(event.id));
+  if (!hasSeatLimit(event)) {
+    return null;
+  }
+  return Math.max(0, event.capacity - (event.registered || 0) - countMyRegistrations(event.id));
 }
 
 // ข้อความที่นั่งคงเหลือ ใช้ทั้งการ์ดและหน้าลงทะเบียน
 function seatText(event) {
   const left = seatsLeft(event);
+  if (left === null) {
+    return 'ไม่ระบุจำนวนที่นั่ง';
+  }
   if (left === 0) {
     return 'ที่นั่งเต็มแล้ว (' + event.capacity + ' ที่นั่ง)';
   }
@@ -286,7 +318,7 @@ function createTicket(event, club, options) {
   let classes = 'ticket';
   if (past) {
     classes += ' is-past';
-  } else if (left <= LOW_SEAT_LIMIT) {
+  } else if (left !== null && left <= LOW_SEAT_LIMIT) {
     classes += ' is-low';
   }
 
@@ -294,6 +326,10 @@ function createTicket(event, club, options) {
   let tags = '<span class="chip">' + escapeHtml(event.type) + '</span>';
   if (event.activityHours > 0) {
     tags += '<span class="chip chip-hours">นับ ' + event.activityHours + ' ชั่วโมงกิจกรรม</span>';
+  }
+  // ตราปั๊มกิจกรรม = หน่วยนับกิจกรรมที่ชมรมใน มบส. ใช้จริงในโพสต์
+  if (event.activityStamps > 0) {
+    tags += '<span class="chip chip-hours">ได้ ' + event.activityStamps + ' ตราปั๊มกิจกรรม</span>';
   }
   if (past) {
     tags += '<span class="chip chip-status">จบแล้ว</span>';
@@ -312,7 +348,9 @@ function createTicket(event, club, options) {
   // ความกว้างแถบเก็บไว้ใน data-percent แล้วให้ applySeatBars() ตั้งค่าทีหลัง
   // (ข้อ T4 ห้าม inline style ยกเว้นค่าที่ JS คำนวณ)
   let seats = '';
-  if (!past) {
+  if (!past && left === null) {
+    seats = '<p class="seat-text">' + seatText(event) + '</p>';
+  } else if (!past) {
     const percent = Math.round(used / event.capacity * 100);
     seats = `
       <div class="seats">
@@ -325,7 +363,7 @@ function createTicket(event, club, options) {
   // span.visually-hidden เพิ่มชื่อกิจกรรมให้โปรแกรมอ่านหน้าจอ ลิงก์ "ลงทะเบียน" แต่ละอันจะไม่ซ้ำกัน
   // options.hideRegister = true ใช้ในหน้ากิจกรรมของฉัน (ลงทะเบียนไว้แล้ว ไม่ต้องมีปุ่มนี้)
   let actions = '';
-  if (!options.hideRegister && !hasStarted(event) && left > 0) {
+  if (!options.hideRegister && !hasStarted(event) && left !== 0) {
     actions += '<a class="btn btn-primary btn-small" href="register.html?event=' + encodeURIComponent(event.id) + '">' +
       'ลงทะเบียน<span class="visually-hidden"> ' + title + '</span></a>';
   }
@@ -344,23 +382,36 @@ function createTicket(event, club, options) {
       <div class="ticket-stub" aria-hidden="true">
         <span class="stub-month">${stub.month}</span>
         <span class="stub-day">${stub.day}</span>
-        <span class="stub-weekday">${stub.weekday}</span>
+        <span class="stub-weekday">${stub.weekday} ${stub.year}</span>
       </div>
       <div class="ticket-body">
         ${poster}
         <div class="ticket-tags">${tags}</div>
         <${h}>${title}</${h}>
-        <p class="ticket-club">${escapeHtml(club.name)}</p>
+        <p class="ticket-club">${escapeHtml(club.name)}${event.organizer ? '<br>จัดโดย ' + escapeHtml(event.organizer) : ''}</p>
         <dl class="ticket-meta">
-          <div><dt>วันที่</dt><dd><time datetime="${escapeHtml(event.date)}">${formatThaiDate(event.date)}</time></dd></div>
+          <div><dt>วันที่</dt><dd><time datetime="${escapeHtml(event.date)}">${formatEventDate(event)}</time></dd></div>
           <div><dt>เวลา</dt><dd>${formatTimeRange(event)}</dd></div>
-          <div><dt>สถานที่</dt><dd>${escapeHtml(event.place)}</dd></div>
+          <div><dt>สถานที่</dt><dd>${escapeHtml(event.place || 'ไม่ระบุสถานที่')}</dd></div>
         </dl>
+        ${event.dateAdjusted && event.originalDate ? '<p class="ticket-note">ปรับวันที่เพื่อสาธิต วันจัดจริง ' + formatThaiDate(event.originalDate) + '</p>' : ''}
+        ${sourceLink(event)}
         ${options.extraInfo || ''}
         ${seats}
         <div class="ticket-actions">${actions}</div>
       </div>
     </article>`;
+}
+
+// ลิงก์ไปโพสต์ต้นฉบับ (ข้อ T8: ข้อมูลทุกกิจกรรมต้องมีแหล่งที่มา)
+// target="_blank" เปิดแท็บใหม่ rel="noopener" กันหน้าใหม่ควบคุมหน้าเว็บเรา
+function sourceLink(event) {
+  if (!event.source) {
+    return '';
+  }
+  return '<p class="ticket-source"><a href="' + escapeHtml(event.source) + '" target="_blank" rel="noopener">' +
+    'ดูโพสต์ต้นฉบับ<span class="visually-hidden"> ของ ' + escapeHtml(event.title) + ' (เปิดแท็บใหม่)</span></a>' +
+    (event.sourceNote ? '<br><small>' + escapeHtml(event.sourceNote) + '</small>' : '') + '</p>';
 }
 
 // ตั้งความกว้างแถบที่นั่งของทุกการ์ดใน container (ต้องเรียกหลังใส่ innerHTML)
@@ -428,7 +479,7 @@ function pad2(number) {
 function renderCountdown(box, event, club) {
   box.innerHTML = `
     <p class="countdown-title"><a href="events.html#event-${escapeHtml(event.id)}">${escapeHtml(event.title)}</a></p>
-    <p class="countdown-when">${formatThaiDate(event.date)} เวลา ${formatTimeRange(event)}<br>${escapeHtml(event.place)}</p>
+    <p class="countdown-when">${formatEventDate(event)} ${formatTimeRange(event)}<br>${escapeHtml(event.place || 'ไม่ระบุสถานที่')}</p>
     <div class="timer" role="timer" aria-label="เวลาที่เหลือก่อนเริ่มกิจกรรม">
       <div class="timer-part"><span class="timer-num" data-part="days">0</span><span class="timer-unit">วัน</span></div>
       <div class="timer-part"><span class="timer-num" data-part="hours">00</span><span class="timer-unit">ชั่วโมง</span></div>

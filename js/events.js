@@ -89,13 +89,13 @@ registerPage('events', function () {
       if (clubId !== '' && e.clubId !== clubId) {
         return false;
       }
-      if (onlyHours && !(e.activityHours > 0)) {
+      if (onlyHours && !(e.activityHours > 0 || e.activityStamps > 0)) {
         return false;
       }
       if (keyword !== '') {
         // ค้นจากชื่อกิจกรรม รายละเอียด สถานที่ และชื่อชมรม (ไม่สนตัวพิมพ์เล็ก-ใหญ่)
         const club = findClub(allClubs, e.clubId);
-        const text = (e.title + ' ' + (e.description || '') + ' ' + e.place + ' ' + club.name).toLowerCase();
+        const text = (e.title + ' ' + (e.description || '') + ' ' + (e.place || '') + ' ' + (e.organizer || '') + ' ' + club.name).toLowerCase();
         if (!text.includes(keyword)) {
           return false;
         }

@@ -17,6 +17,7 @@ registerPage('home', function () {
   const countdownBox = document.querySelector('#countdown-box');
   const countdownTitle = document.querySelector('#countdown-title');
   const featuredGrid = document.querySelector('#featured-grid');
+  const featuredTitle = document.querySelector('#featured-title');
   const typeLinks = document.querySelector('#type-links');
 
   // จำนวนการ์ดกิจกรรมแนะนำที่แสดง
@@ -87,8 +88,16 @@ registerPage('home', function () {
     }
     picked = picked.slice(0, FEATURED_LIMIT);
 
+    // ยังไม่มีกิจกรรมที่กำลังจะมาถึง → แสดงกิจกรรมล่าสุดที่จบไปแล้วแทน หน้าแรกจะได้ไม่ว่าง
+    // reverse() กลับลำดับ: กิจกรรมที่เพิ่งจบล่าสุดขึ้นก่อน
+    featuredTitle.textContent = 'กิจกรรมแนะนำ';
     if (picked.length === 0) {
-      featuredGrid.innerHTML = '<p class="grid-message">ยังไม่มีกิจกรรมที่กำลังจะมาถึง</p>';
+      picked = sortByStart(data.events).reverse().slice(0, FEATURED_LIMIT);
+      featuredTitle.textContent = 'กิจกรรมล่าสุด';
+    }
+
+    if (picked.length === 0) {
+      featuredGrid.innerHTML = '<p class="grid-message">ยังไม่มีข้อมูลกิจกรรม</p>';
     } else {
       let html = '';
       for (const e of picked) {
@@ -104,12 +113,14 @@ registerPage('home', function () {
   // ลิงก์ประเภทกิจกรรม พร้อมจำนวนกิจกรรมที่กำลังจะมาถึงของแต่ละประเภท
   function showTypeLinks(data) {
     // นับจำนวนต่อประเภท เก็บใน object เช่น { 'วิชาการ': 3, 'กีฬา': 2 }
+    // นับทั้งหมด และนับเฉพาะที่ยังไม่จบ แยกตามประเภท เช่น { 'กีฬา': { all: 7, upcoming: 1 } }
     const counts = {};
     for (const e of data.events) {
-      if (isPast(e)) {
-        continue;                 // ข้ามกิจกรรมที่จบแล้ว
+      counts[e.type] = counts[e.type] || { all: 0, upcoming: 0 };
+      counts[e.type].all += 1;
+      if (!isPast(e)) {
+        counts[e.type].upcoming += 1;
       }
-      counts[e.type] = (counts[e.type] || 0) + 1;
     }
 
     let html = '';
@@ -118,7 +129,7 @@ registerPage('home', function () {
         <li>
           <a href="events.html?type=${encodeURIComponent(type)}" data-type="${escapeHtml(type)}">
             <span class="type-name">${escapeHtml(type)}</span>
-            <span class="type-count">${counts[type]} กิจกรรมที่กำลังจะมาถึง</span>
+            <span class="type-count">${counts[type].all} กิจกรรม${counts[type].upcoming > 0 ? ' (กำลังจะมาถึง ' + counts[type].upcoming + ')' : ''}</span>
           </a>
         </li>`;
     }

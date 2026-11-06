@@ -575,6 +575,7 @@ a {
 [data-type="กีฬา"]         { --tint: #ffe2c7; --tint-ink: #833800; }
 [data-type="จิตอาสา"]      { --tint: #d3f0de; --tint-ink: #155c37; }
 [data-type="ศิลปวัฒนธรรม"] { --tint: #f8dcec; --tint-ink: #84204e; }
+[data-type="ศาสนา"]        { --tint: #fdecc8; --tint-ink: #7a4b00; }
 
 /* auto-fill + minmax: จำนวนคอลัมน์ปรับเองตามความกว้าง (มือถือ 1, แท็บเล็ต 2, เดสก์ท็อป 3)
    min(100%, 300px) กันการ์ดกว้างเกินจอที่แคบกว่า 300px */
@@ -772,6 +773,17 @@ a {
   gap: 8px;
   margin-top: auto;            /* ดันปุ่มลงล่างสุด การ์ดในแถวเดียวกันปุ่มจะตรงกัน */
   padding-top: 4px;
+}
+
+/* ลิงก์ไปโพสต์ต้นฉบับ + หมายเหตุแหล่งที่มา (ข้อ T8) */
+.ticket-source {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.ticket-source a {
+  font-weight: 600;
 }
 
 .ticket-note {

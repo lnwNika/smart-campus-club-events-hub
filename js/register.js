@@ -148,7 +148,7 @@ registerPage('register', function () {
     for (const e of open) {
       const stub = getStubParts(e.date);
       const left = seatsLeft(e);
-      const status = left === 0 ? 'เต็มแล้ว' : 'เหลือ ' + left + ' ที่';
+      const status = left === null ? 'ไม่ระบุที่นั่ง' : (left === 0 ? 'เต็มแล้ว' : 'เหลือ ' + left + ' ที่');
       const option = new Option(stub.day + ' ' + stub.month + ' — ' + e.title + ' (' + status + ')', e.id);
       option.disabled = (left === 0);       // ที่นั่งเต็ม เลือกไม่ได้
       eventSelect.add(option);
@@ -172,9 +172,12 @@ registerPage('register', function () {
 
     const club = findClub(allClubs, event.clubId);
     const left = seatsLeft(event);
-    const hours = event.activityHours > 0
-      ? '<span class="chip chip-hours">นับ ' + event.activityHours + ' ชั่วโมงกิจกรรม</span>'
-      : '<span class="chip chip-status">ไม่นับชั่วโมงกิจกรรม</span>';
+    let hours = '<span class="chip chip-status">ไม่ระบุชั่วโมงหรือตราปั๊มกิจกรรม</span>';
+    if (event.activityHours > 0) {
+      hours = '<span class="chip chip-hours">นับ ' + event.activityHours + ' ชั่วโมงกิจกรรม</span>';
+    } else if (event.activityStamps > 0) {
+      hours = '<span class="chip chip-hours">ได้ ' + event.activityStamps + ' ตราปั๊มกิจกรรม</span>';
+    }
 
     summaryBox.innerHTML = `
       <div class="summary-body" data-type="${escapeHtml(event.type)}">
@@ -182,13 +185,13 @@ registerPage('register', function () {
         <p class="summary-title">${escapeHtml(event.title)}</p>
         <p class="ticket-club">${escapeHtml(club.name)}</p>
         <dl class="ticket-meta">
-          <div><dt>วันที่</dt><dd>${formatThaiDate(event.date)}</dd></div>
+          <div><dt>วันที่</dt><dd>${formatEventDate(event)}</dd></div>
           <div><dt>เวลา</dt><dd>${formatTimeRange(event)}</dd></div>
-          <div><dt>สถานที่</dt><dd>${escapeHtml(event.place)}</dd></div>
+          <div><dt>สถานที่</dt><dd>${escapeHtml(event.place || 'ไม่ระบุสถานที่')}</dd></div>
         </dl>
         <p class="summary-desc">${escapeHtml(event.description || '')}</p>
         <div>
-          <p class="seat-big">${left}</p>
+          <p class="seat-big">${left === null ? '–' : left}</p>
           <p>${seatText(event)}</p>
         </div>
       </div>`;
@@ -242,7 +245,7 @@ registerPage('register', function () {
     // แจ้งผล แล้วย้ายโฟกัสไปที่กล่องแจ้งผล (โปรแกรมอ่านหน้าจออ่านทันที)
     formSuccess.innerHTML = `
       <h3>ลงทะเบียนสำเร็จ</h3>
-      <p>ลงทะเบียน "${escapeHtml(event.title)}" แล้ว วัน${formatThaiDate(event.date)} เวลา ${formatTimeRange(event)}</p>
+      <p>ลงทะเบียน "${escapeHtml(event.title)}" แล้ว ${formatEventDate(event)} ${formatTimeRange(event)}</p>
       <a class="btn btn-primary btn-small" href="my-events.html">ดูกิจกรรมของฉัน</a>`;
     formSuccess.hidden = false;
     formSuccess.focus();
