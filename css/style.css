@@ -1055,11 +1055,6 @@ a {
   border-color: var(--danger);
 }
 
-.field-hint {
-  color: var(--ink-soft);
-  font-size: 0.88rem;
-}
-
 .field-error {
   color: var(--danger);
   font-size: 0.9rem;
