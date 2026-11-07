@@ -11,7 +11,6 @@
 registerPage('my-events', function () {
 
   const countdownBox = document.querySelector('#countdown-box');
-  const hoursBox = document.querySelector('#hours-summary');
   const upcomingList = document.querySelector('#my-upcoming');
   const pastList = document.querySelector('#my-past');
 
@@ -101,34 +100,10 @@ registerPage('my-events', function () {
   }
 
 
-  // สรุปชั่วโมงกิจกรรม (ฟีเจอร์เสริม)
-  //   สะสมแล้ว      = ชั่วโมงของกิจกรรมที่จบแล้ว
-  //   จะได้รับเพิ่ม  = ชั่วโมงของกิจกรรมที่ยังไม่จบ
-  // reduce() รวมค่าทุกตัวใน array ให้เหลือค่าเดียว (เริ่มจาก 0)
-  function renderHours(items) {
-    // รวมค่าของ field หนึ่งจากรายการที่เลือก (null นับเป็น 0)
-    function total(list, field) {
-      return list.reduce(function (sum, item) { return sum + (item.event[field] || 0); }, 0);
-    }
-    const done = items.filter(function (item) { return isPast(item.event); });
-    const coming = items.filter(function (item) { return !isPast(item.event); });
-
-    hoursBox.innerHTML = `
-      <div class="hours-stats">
-        <p class="hours-stat hours-stat-done"><strong>${total(done, 'activityStamps')}</strong> ตราปั๊มที่สะสมแล้ว</p>
-        <p class="hours-stat"><strong>${total(coming, 'activityStamps')}</strong> ตราปั๊มที่จะได้รับเพิ่ม</p>
-        <p class="hours-stat hours-stat-done"><strong>${total(done, 'activityHours')}</strong> ชั่วโมงที่สะสมแล้ว</p>
-        <p class="hours-stat"><strong>${total(coming, 'activityHours')}</strong> ชั่วโมงที่จะได้รับเพิ่ม</p>
-      </div>
-      <p class="hours-note">คำนวณจากกิจกรรมที่ลงทะเบียนในเบราว์เซอร์นี้ และนับเฉพาะกิจกรรมที่โพสต์ของชมรมระบุตราปั๊มหรือชั่วโมงไว้ ของจริงขึ้นกับการเช็กชื่อของผู้จัด</p>`;
-  }
-
-
   function renderAll() {
     const items = getMyItems();
     renderLists(items);
     renderMyCountdown(items);
-    renderHours(items);
   }
 
 
@@ -172,7 +147,6 @@ registerPage('my-events', function () {
     } catch (error) {
       console.error(error);
       renderCountdownEmpty(countdownBox, 'โหลดข้อมูลไม่สำเร็จ');
-      hoursBox.innerHTML = '';
       upcomingList.innerHTML = '<li></li>';
       showLoadError(upcomingList.firstElementChild, initMyEvents);
     }

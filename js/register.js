@@ -172,11 +172,9 @@ registerPage('register', function () {
 
     const club = findClub(allClubs, event.clubId);
     const left = seatsLeft(event);
-    let hours = '<span class="chip chip-status">ไม่ระบุชั่วโมงหรือตราปั๊มกิจกรรม</span>';
+    let hours = '<span class="chip chip-status">ไม่ระบุชั่วโมงกิจกรรม</span>';
     if (event.activityHours > 0) {
       hours = '<span class="chip chip-hours">นับ ' + event.activityHours + ' ชั่วโมงกิจกรรม</span>';
-    } else if (event.activityStamps > 0) {
-      hours = '<span class="chip chip-hours">ได้ ' + event.activityStamps + ' ตราปั๊มกิจกรรม</span>';
     }
 
     summaryBox.innerHTML = `

@@ -89,7 +89,7 @@ registerPage('events', function () {
       if (clubId !== '' && e.clubId !== clubId) {
         return false;
       }
-      if (onlyHours && !(e.activityHours > 0 || e.activityStamps > 0)) {
+      if (onlyHours && !(e.activityHours > 0)) {
         return false;
       }
       if (keyword !== '') {

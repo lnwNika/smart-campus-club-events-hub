@@ -1141,49 +1141,6 @@ a {
   padding-top: 24px;
 }
 
-.hours-card {
-  padding: 22px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-}
-
-.hours-card h2 {
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-
-.hours-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 14px;
-}
-
-.hours-stat {
-  padding: 14px;
-  border-radius: 12px;
-  background: var(--paper);
-}
-
-.hours-stat strong {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 2.4rem;
-  font-weight: 700;
-  line-height: 1.1;
-}
-
-.hours-stat-done {
-  background: var(--highlight);
-}
-
-.hours-note {
-  margin-top: 12px;
-  color: var(--ink-soft);
-  font-size: 0.88rem;
-}
-
 .my-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
@@ -1268,10 +1225,6 @@ a {
   .filter-form .field-check {
     align-items: center;
     min-height: 46px;
-  }
-
-  .hours-stats {
-    gap: 16px;
   }
 
   /* ปฏิทิน: จอกว้างพอแล้ว แสดงชื่อกิจกรรมแทนจุด */
@@ -1373,10 +1326,6 @@ a {
   .form-card,
   .event-summary {
     padding: 28px;
-  }
-
-  .my-top {
-    grid-template-columns: 1.3fr 1fr;
   }
 
   .cal-day {

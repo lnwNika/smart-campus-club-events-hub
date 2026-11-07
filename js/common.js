@@ -321,10 +321,6 @@ function createTicket(event, club, options) {
   if (event.activityHours > 0) {
     tags += '<span class="chip chip-hours">นับ ' + event.activityHours + ' ชั่วโมงกิจกรรม</span>';
   }
-  // ตราปั๊มกิจกรรม = หน่วยนับกิจกรรมที่ชมรมใน มบส. ใช้จริงในโพสต์
-  if (event.activityStamps > 0) {
-    tags += '<span class="chip chip-hours">ได้ ' + event.activityStamps + ' ตราปั๊มกิจกรรม</span>';
-  }
   if (past) {
     tags += '<span class="chip chip-status">จบแล้ว</span>';
   } else if (left === 0) {
