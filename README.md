@@ -1,4 +1,4 @@
-# Club & Events Hub — รวมกิจกรรมชมรมและระบบลงทะเบียนเข้าร่วม
+<img width="530" height="552" alt="image" src="https://github.com/user-attachments/assets/d42ecf28-2cfe-4554-99db-606782b42bbd" /># Club & Events Hub — รวมกิจกรรมชมรมและระบบลงทะเบียนเข้าร่วม
 
 รายวิชา SC17332 · Mini Project Smart Campus · **กลุ่มที่ 3**
 
@@ -93,7 +93,16 @@
 
 ## ผล Lighthouse (Accessibility)
 
-![ผล Lighthouse ของหน้าหลัก: Accessibility 100](images/lighthouse.png)
+<img width="520" height="520" alt="image" src="https://github.com/user-attachments/assets/a9b7f8b7-bf34-4a0d-b971-3481c53c71f9" />
+<img width="520" height="520" alt="image" src="https://github.com/user-attachments/assets/439b13ed-b3d2-4bfb-ad2e-911a798f9f57" />
+<img width="520" height="520" alt="image" src="https://github.com/user-attachments/assets/56605035-180e-4eb9-9a45-f7a11b3fb5e5" />
+<img width="520" height="520" alt="image" src="https://github.com/user-attachments/assets/26257128-8218-419a-a5f3-a83f65f4f5cd" />
+<img width="520" height="520" alt="image" src="https://github.com/user-attachments/assets/49d377a8-77e8-43bf-94c6-d9838008b1ef" />
+
+
+
+
+
 
 ## การใช้ AI
 
