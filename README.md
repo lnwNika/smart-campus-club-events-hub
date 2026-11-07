@@ -46,7 +46,7 @@
 | เสริม | มุมมองปฏิทินรายเดือนด้วย CSS Grid | ✅ | `js/events.js` → `renderCalendar()` |
 | เสริม | ปุ่มแชร์กิจกรรม (Clipboard API) | ✅ | `js/common.js` → `shareEvent()` |
 
-**เทคโนโลยี:** HTML, CSS และ JavaScript ล้วน ไม่ใช้ framework หรือ library (ใช้เฉพาะ Google Fonts: Noto Sans Thai)
+**เทคโนโลยี:** HTML, CSS และ JavaScript ล้วน ไม่ใช้ framework หรือ library (ใช้เฉพาะฟอนต์ Noto Sans Thai จาก Google Fonts เก็บไฟล์ไว้ในโฟลเดอร์ `fonts/` สัญญาอนุญาต SIL Open Font License)
 
 ## แหล่งที่มาของข้อมูลจริง
 

@@ -11,6 +11,7 @@
      @media (min-width: 1024px) = เดสก์ท็อป  (จุดเปลี่ยนที่ 2)
 
    สารบัญ (ค้นด้วย Ctrl+F ตามเลข)
+     0) ฟอนต์
      1) ตัวแปร            2) พื้นฐาน + การเข้าถึง   3) Header / เมนู
      4) ปุ่มและลิงก์        5) Hero + นับถอยหลัง      6) หัวข้อและ section
      7) การ์ดกิจกรรม (ตั๋ว)  8) ตัวกรอง               9) ปฏิทิน
@@ -18,6 +19,30 @@
      13) Footer + แจ้งเตือน  14) Responsive           15) เปลี่ยนหน้า
      16) ลดการเคลื่อนไหว
    ========================================================= */
+
+
+/* ---------- 0) ฟอนต์ ----------
+   ไฟล์ฟอนต์อยู่ในโฟลเดอร์ fonts/ (Noto Sans Thai จาก Google Fonts สัญญาอนุญาต SIL Open Font License)
+   ไฟล์เดียวมีทุกความหนา 400–700 จึงประกาศ font-weight เป็นช่วง
+   unicode-range = โหลดไฟล์นั้นเฉพาะเมื่อหน้ามีตัวอักษรในช่วงนี้
+   font-display: swap = ระหว่างรอฟอนต์ให้แสดงข้อความด้วยฟอนต์ของเครื่องไปก่อน */
+@font-face {
+  font-family: "Noto Sans Thai";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/noto-sans-thai-thai.woff2") format("woff2");
+  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
+}
+
+@font-face {
+  font-family: "Noto Sans Thai";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/noto-sans-thai-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 
 /* ---------- 1) ตัวแปร (ข้อ T4: ใช้ CSS custom properties สำหรับสีหลัก) ---------- */
@@ -1337,6 +1362,7 @@ a {
 /* ---------- 15) เนื้อหาค่อย ๆ ปรากฏเมื่อเปิดหน้า ----------
    ค่อย ๆ ปรากฏ 0.2 วินาที ให้รู้ว่าเนื้อหาเปลี่ยนแล้ว */
 main {
+  min-height: 100vh;           /* จองพื้นที่ไว้ก่อน footer จึงไม่กระโดดลงเมื่อ JS เติมการ์ดเสร็จ (ลด CLS ใน Lighthouse) */
   animation: page-in 0.2s ease-out;
 }
 
