@@ -2,8 +2,10 @@
    style.css — Club & Events Hub (ใช้ร่วมกันทุกหน้า)
    รายวิชา SC17332 · Mini Project Smart Campus · กลุ่มที่ 3
 
-   แนวคิดดีไซน์: การ์ดกิจกรรมทำเป็น "ตั๋ว" มีต้นขั้วบอกวันที่ด้านซ้าย
+   แนวคิดดีไซน์: ธีมมืดแบบเว็บเกม (พื้นกรมท่าเข้ม เส้นตาราง แสงเรืองสีฟ้า-ม่วง ปุ่มสีฟ้า)
+   การ์ดกิจกรรมทำเป็น "ตั๋ว" มีต้นขั้วบอกวันที่ด้านซ้าย
    คั่นด้วยเส้นประและรอยเจาะครึ่งวงกลม สื่อถึงการลงทะเบียน/จองที่นั่ง
+   กล่องนับถอยหลังทำเป็นแถบ HUD แบบหน้าจอเกม
 
    เขียนแบบ mobile-first (ข้อ T5)
      สไตล์พื้นฐาน = จอมือถือ (360px ขึ้นไป)
@@ -22,8 +24,9 @@
 
 
 /* ---------- 0) ฟอนต์ ----------
-   ไฟล์ฟอนต์อยู่ในโฟลเดอร์ fonts/ (Noto Sans Thai จาก Google Fonts สัญญาอนุญาต SIL Open Font License)
-   ไฟล์เดียวมีทุกความหนา 400–700 จึงประกาศ font-weight เป็นช่วง
+   ไฟล์ฟอนต์อยู่ในโฟลเดอร์ fonts/ (จาก Google Fonts สัญญาอนุญาต SIL Open Font License ทั้ง 2 ฟอนต์)
+   - Noto Sans Thai = ตัวเนื้อหา ไฟล์เดียวมีทุกความหนา 400–700 จึงประกาศ font-weight เป็นช่วง
+   - Chakra Petch   = หัวข้อและตัวเลข (ทรงเหลี่ยมแบบเกม มีภาษาไทย) ใช้เฉพาะตัวหนา 700
    unicode-range = โหลดไฟล์นั้นเฉพาะเมื่อหน้ามีตัวอักษรในช่วงนี้
    font-display: swap = ระหว่างรอฟอนต์ให้แสดงข้อความด้วยฟอนต์ของเครื่องไปก่อน */
 @font-face {
@@ -44,38 +47,64 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* หัวข้อที่ตั้ง font-weight 600 จะใช้ไฟล์ตัวหนา 700 ไฟล์เดียวกัน (ไม่ต้องโหลดเพิ่ม) */
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url("../fonts/chakra-petch-700-thai.woff2") format("woff2");
+  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
+}
+
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url("../fonts/chakra-petch-700-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 
 /* ---------- 1) ตัวแปร (ข้อ T4: ใช้ CSS custom properties สำหรับสีหลัก) ---------- */
 :root {
-  --paper: #f2f4f8;          /* พื้นหลังทั้งหน้า (เทาอมฟ้า) */
-  --surface: #ffffff;        /* พื้นการ์ด */
-  --ink: #18223d;            /* ตัวอักษรหลัก (กรมท่า) */
-  --ink-soft: #4a5571;       /* ตัวอักษรรอง (contrast กับพื้น paper ≈ 7:1) */
-  --line: #d8dde7;           /* เส้นขอบบาง */
-  --field-line: #737d93;     /* ขอบช่องกรอก (ต้อง contrast ≥ 3:1 กับพื้นขาว) */
+  color-scheme: dark;        /* ให้ช่องเลือก แถบเลื่อน และ dropdown ของเบราว์เซอร์เป็นโหมดมืดด้วย */
 
-  --accent: #4b2dbf;         /* สีหลัก (ม่วง) ตัวอักษรขาวบนสีนี้ contrast ≈ 9:1 */
-  --accent-hover: #391f9c;
-  --accent-soft: #ece7ff;
+  --paper: #070b14;          /* พื้นหลังทั้งหน้า (กรมท่าเกือบดำ) */
+  --surface: #0f1626;        /* พื้นการ์ด */
+  --surface-2: #0b1220;      /* พื้นช่องกรอกและช่องตัวเลข (เข้มกว่าการ์ด) */
+  --ink: #eef3ff;            /* ตัวอักษรหลัก (ขาวอมฟ้า) */
+  --ink-soft: #9aa8c4;       /* ตัวอักษรรอง (contrast กับพื้นการ์ด ≈ 7:1) */
+  --line: #1f2a40;           /* เส้นขอบบาง */
+  --line-strong: #3a4a6b;    /* ขอบปุ่มแบบโปร่ง */
+  --field-line: #63708c;     /* ขอบช่องกรอก (ต้อง contrast ≥ 3:1 กับพื้นช่อง) */
+
+  --accent: #0a6fd1;         /* สีหลัก (ฟ้า) ใช้เป็นพื้นปุ่ม ตัวอักษรขาวบนสีนี้ contrast ≈ 5:1 */
+  --accent-hover: #0861b8;
+  --accent-text: #4db3ff;    /* ฟ้าสว่าง ใช้เป็นสีตัวอักษร/ลิงก์บนพื้นมืด (contrast ≈ 8:1) */
+  --accent-soft: rgba(77, 179, 255, 0.14);
+  --glow: rgba(30, 155, 255, 0.45);   /* แสงเรืองรอบปุ่ม/การ์ดตอนชี้เมาส์ */
   --highlight: #ffd84d;      /* เหลืองไฮไลต์ ใช้กับป้าย "นับชั่วโมงได้" */
 
-  --danger: #b42318;
-  --danger-soft: #fdecea;
-  --success: #146c3f;
-  --success-soft: #e3f4ea;
+  --danger: #ff7a8e;         /* แดงอ่อน ใช้เป็นตัวอักษรบนพื้นมืด */
+  --danger-strong: #c0263f;  /* แดงเข้ม ใช้เป็นพื้นปุ่มที่มีตัวอักษรขาว */
+  --danger-soft: #3b1220;
+  --success: #5ee69a;
+  --success-soft: #0f2e1d;
 
-  /* สีประจำประเภทกิจกรรม: --tint = พื้น, --tint-ink = ตัวอักษรบนพื้นนั้น
+  /* สีประจำประเภทกิจกรรม: --tint = พื้น (เข้ม), --tint-ink = ตัวอักษรบนพื้นนั้น (สว่าง)
      ค่าเริ่มต้น (ประเภทอื่น ๆ) ตั้งไว้ที่นี่ ส่วนแต่ละประเภทกำหนดในข้อ 7 */
-  --tint: #e8e5f4;
-  --tint-ink: #3e3470;
+  --tint: #1c2238;
+  --tint-ink: #b9b3ff;
 
-  /* ใช้ฟอนต์เดียวทั้งเว็บ อยากเปลี่ยนฟอนต์แก้ 2 บรรทัดนี้ + ลิงก์ Google Fonts ใน <head> */
-  --font-display: "Noto Sans Thai", sans-serif;
+  /* หัวข้อใช้ Chakra Petch เนื้อหาใช้ Noto Sans Thai (ไฟล์ฟอนต์อยู่ในข้อ 0) */
+  --font-display: "Chakra Petch", "Noto Sans Thai", sans-serif;
   --font-body: "Noto Sans Thai", sans-serif;
 
   --radius: 14px;
-  --radius-lg: 20px;
-  --pill: 999px;
+  --radius-lg: 16px;
+  --pill: 8px;               /* ปุ่มและป้ายเป็นเหลี่ยมมนเล็กน้อยแบบเว็บเกม */
   --stub: 78px;              /* ความกว้างต้นขั้วตั๋ว */
   --max: 1180px;             /* ความกว้างสูงสุดของเนื้อหา */
 }
@@ -102,6 +131,24 @@ body {
   background: var(--paper);
 }
 
+/* ฉากหลังส่วนบนของทุกหน้า: เส้นตาราง + แสงเรืองฟ้า/ม่วง แล้วค่อย ๆ จางลง
+   วาดด้วย CSS ล้วน (ไม่มีไฟล์รูป) วางไว้หลังเนื้อหาด้วย z-index: -1 */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 760px;
+  background:
+    radial-gradient(520px 360px at 12% 18%, rgba(193, 60, 255, 0.22), transparent 70%),
+    radial-gradient(600px 420px at 88% 24%, rgba(30, 155, 255, 0.26), transparent 70%),
+    linear-gradient(rgba(120, 150, 210, 0.07) 1px, transparent 1px) 0 0 / 56px 56px,
+    linear-gradient(90deg, rgba(120, 150, 210, 0.07) 1px, transparent 1px) 0 0 / 56px 56px;
+  -webkit-mask-image: linear-gradient(#000 55%, transparent);
+  mask-image: linear-gradient(#000 55%, transparent);
+  pointer-events: none;
+}
+
 h1, h2, h3, p, ul, ol, dl, dd {
   margin: 0;
 }
@@ -122,7 +169,7 @@ img {
 }
 
 a {
-  color: var(--accent);
+  color: var(--accent-text);
   text-underline-offset: 3px;
 }
 
@@ -148,7 +195,7 @@ a {
 /* วงโฟกัสเมื่อใช้คีย์บอร์ด (ข้อ T3: มองเห็น focus ชัดเจน)
    :focus-visible แสดงเฉพาะตอนกด Tab ไม่แสดงตอนคลิกเมาส์ */
 :focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--accent-text);
   outline-offset: 3px;
 }
 
@@ -160,7 +207,7 @@ a {
   z-index: 300;
   padding: 10px 18px;
   border-radius: var(--pill);
-  background: var(--ink);
+  background: var(--accent);
   color: #fff;
   font-weight: 600;
   transition: top 0.2s;
@@ -185,9 +232,9 @@ a {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(242, 244, 248, 0.92);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line);
+  background: rgba(7, 11, 20, 0.82);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #1a2438;
 }
 
 /* Flexbox: โลโก้ + เมนูเรียงแนวนอน ถ้าที่ไม่พอให้ขึ้นบรรทัดใหม่ */
@@ -201,11 +248,27 @@ a {
 }
 
 .logo {
-  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: #fff;
   font-family: var(--font-display);
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   text-decoration: none;
+}
+
+/* สัญลักษณ์หกเหลี่ยมหน้าชื่อเว็บ วาดด้วย clip-path (ไม่ใช้ไฟล์รูป) */
+.logo::before {
+  content: "";
+  width: 26px;
+  height: 30px;
+  background: linear-gradient(160deg, var(--accent-text), var(--accent));
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  box-shadow: 0 0 18px var(--glow);
 }
 
 /* มือถือ: เมนูเต็มความกว้าง เลื่อนซ้าย-ขวาได้ในแถบเมนูเท่านั้น (หน้าเว็บไม่ scroll แนวนอน) */
@@ -236,14 +299,15 @@ a {
 }
 
 .nav-links a:hover {
-  background: var(--surface);
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
 }
 
 /* หน้าปัจจุบัน: เลือกจาก aria-current ไม่ต้องเพิ่ม class เอง */
 .nav-links a[aria-current="page"] {
   background: var(--accent-soft);
-  color: var(--accent);
+  box-shadow: inset 0 -2px 0 var(--accent-text);   /* เส้นสีฟ้าใต้เมนูที่เลือกอยู่ */
+  color: #fff;
   font-weight: 600;
 }
 
@@ -279,7 +343,7 @@ a {
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
 .btn-primary {
@@ -292,13 +356,14 @@ a {
 }
 
 .btn-ghost {
-  border-color: var(--ink);
+  border-color: var(--line-strong);
   background: transparent;
   color: var(--ink);
 }
 
 .btn-ghost:hover {
-  background: var(--ink);
+  border-color: var(--accent-text);
+  background: var(--accent-soft);
   color: #fff;
 }
 
@@ -309,8 +374,24 @@ a {
 }
 
 .btn-danger:hover {
-  background: var(--danger);
+  border-color: var(--danger-strong);
+  background: var(--danger-strong);
   color: #fff;
+}
+
+/* ลูกเล่นตอนชี้เมาส์ / กด Tab มาที่ปุ่ม: ลอยขึ้นและมีแสงเรือง
+   ใส่ใน @media (hover: hover) ให้ทำงานเฉพาะอุปกรณ์ที่มีเมาส์ (มือถือแตะแล้วจะไม่ค้าง) */
+@media (hover: hover) {
+  .btn-primary:hover,
+  .btn-ghost:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 1px var(--accent-text), 0 10px 26px var(--glow);
+  }
+}
+
+.btn-primary:focus-visible,
+.btn-ghost:focus-visible {
+  box-shadow: 0 0 0 1px var(--accent-text), 0 10px 26px var(--glow);
 }
 
 .btn-small {
@@ -328,7 +409,7 @@ a {
 }
 
 .text-link:hover {
-  color: var(--accent-hover);
+  color: #8fd0ff;
 }
 
 /* ปุ่มที่หน้าตาเหมือนลิงก์ (ใช้ในข้อความ "ลองอีกครั้ง") */
@@ -336,7 +417,7 @@ a {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font: inherit;
   font-weight: 600;
   text-decoration: underline;
@@ -349,7 +430,7 @@ a {
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--line-strong);
   border-radius: 50%;
   background: var(--surface);
   color: var(--ink);
@@ -360,43 +441,65 @@ a {
 }
 
 .icon-btn:hover {
-  border-color: var(--ink);
+  border-color: var(--accent-text);
 }
 
 
 /* ---------- 5) Hero + นับถอยหลัง ---------- */
-/* Grid: มือถือ 1 คอลัมน์ (ข้อความอยู่บน กล่องนับถอยหลังอยู่ล่าง) เดสก์ท็อปแบ่ง 2 คอลัมน์ (ข้อ 14) */
+/* Grid 1 คอลัมน์: ข้อความจัดกึ่งกลางแบบหน้าเปิดเว็บเกม แล้วตามด้วยแถบนับถอยหลังเต็มความกว้าง */
 .hero {
   display: grid;
-  gap: 28px;
-  padding-block: 32px 8px;
+  gap: 40px;
+  padding-block: 48px 8px;
+}
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ข้อความเล็กเหนือหัวข้อ */
+.eyebrow {
+  margin-bottom: 14px;
+  color: var(--accent-text);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.26em;
 }
 
 .hero h1 {
-  font-size: clamp(1.9rem, 6.5vw, 3.3rem);   /* ขนาดยืดตามความกว้างจอ แต่ไม่เล็ก/ใหญ่เกินช่วงนี้ */
+  color: #fff;
+  font-size: clamp(2.2rem, 7vw, 4.2rem);   /* ขนาดยืดตามความกว้างจอ แต่ไม่เล็ก/ใหญ่เกินช่วงนี้ */
   font-weight: 700;
-  line-height: 1.35;         /* ภาษาไทยมีวรรณยุกต์ด้านบน ถ้าน้อยกว่านี้บรรทัดจะชนกัน */
+  line-height: 1.3;          /* ภาษาไทยมีวรรณยุกต์ด้านบน ถ้าน้อยกว่านี้บรรทัดจะชนกัน */
+  text-shadow: 0 0 40px rgba(30, 155, 255, 0.35);
 }
 
 .hero-lead {
   max-width: 34em;
-  margin-top: 14px;
-  color: var(--ink-soft);
+  margin-top: 16px;
+  color: #b7c3dc;
   font-size: 1.08rem;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 24px;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 28px;
 }
 
-/* กล่องนับถอยหลัง: จุดเด่นเดียวของหน้า ใช้พื้นสีเข้ม */
+/* กล่องนับถอยหลัง: แถบแบบ HUD ในเกม พื้นไล่สีฟ้าเข้ม ขอบฟ้า */
 .countdown-card {
   padding: 22px 22px 24px;
+  border: 1px solid #2a4a7a;
   border-radius: var(--radius-lg);
-  background: var(--ink);
+  background: linear-gradient(120deg, rgba(10, 111, 209, 0.24), rgba(15, 22, 38, 0.94) 50%);
+  box-shadow: inset 0 0 0 1px rgba(77, 179, 255, 0.08), 0 20px 50px rgba(0, 0, 0, 0.45);
   color: #fff;
 }
 
@@ -404,22 +507,38 @@ a {
   color: #fff;
 }
 
-/* บนพื้นเข้ม วงโฟกัสสีม่วงมองไม่เห็น จึงเปลี่ยนเป็นสีเหลือง */
+/* บนพื้นฟ้าเข้ม ใช้วงโฟกัสสีเหลืองให้เห็นชัด */
 .countdown-card :focus-visible {
   outline-color: var(--highlight);
 }
 
+/* หัวกล่อง + จุดแดงเรืองแสงแบบ "กำลังถ่ายทอดสด" */
 .countdown-label {
-  color: #c9cff0;
-  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--accent-text);
+  font-family: var(--font-display);
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.countdown-label::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff4d6d;
+  box-shadow: 0 0 10px #ff4d6d;
 }
 
 .countdown-title {
   margin-top: 6px;
-  font-size: 1.35rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .countdown-title a {
@@ -432,7 +551,7 @@ a {
 
 .countdown-when {
   margin-top: 4px;
-  color: #d5daf0;
+  color: #b7c3dc;
   font-size: 0.95rem;
 }
 
@@ -443,7 +562,7 @@ a {
   gap: 10px;
   margin-top: 18px;
   padding-top: 18px;
-  border-top: 2px dashed rgba(255, 255, 255, 0.28);   /* เส้นประแบบรอยฉีกตั๋ว */
+  border-top: 2px dashed rgba(255, 255, 255, 0.18);   /* เส้นประแบบรอยฉีกตั๋ว */
 }
 
 .timer-part {
@@ -451,8 +570,14 @@ a {
   flex-direction: column;
   align-items: center;
   padding: 10px 4px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #2a3a58;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+/* ช่องนาทีเป็นสีฟ้า ให้เห็นว่าเวลากำลังเดิน */
+.timer-part:last-child .timer-num {
+  color: var(--accent-text);
 }
 
 .timer-num {
@@ -464,13 +589,13 @@ a {
 }
 
 .timer-unit {
-  color: #c9cff0;
+  color: var(--ink-soft);
   font-size: 0.88rem;
 }
 
 .countdown-status {
   margin-top: 10px;
-  color: #d5daf0;
+  color: #b7c3dc;
 }
 
 .countdown-foot {
@@ -484,7 +609,7 @@ a {
 
 .countdown-foot .btn:hover {
   background: #fff;
-  color: var(--ink);
+  color: var(--surface-2);
 }
 
 
@@ -494,7 +619,8 @@ a {
 }
 
 .page-head h1 {
-  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  color: #fff;
+  font-size: clamp(2rem, 5.5vw, 2.9rem);
   font-weight: 700;
 }
 
@@ -518,8 +644,9 @@ a {
 }
 
 .section-head h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
+  color: #fff;
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  font-weight: 700;
 }
 
 .count-pill {
@@ -560,26 +687,29 @@ a {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 18px 20px;
-  border: 2px solid transparent;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--tint-ink);   /* แถบสีประจำประเภทด้านบน */
   border-radius: var(--radius);
-  background: var(--tint);
-  color: var(--tint-ink);
+  background: var(--surface);
+  color: #fff;
   text-decoration: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
 }
 
 .type-links a:hover {
-  border-color: var(--tint-ink);
+  border-color: var(--accent-text);
+  border-top-color: var(--tint-ink);
 }
 
 .type-name {
   font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.35rem;
+  font-weight: 700;
 }
 
 .type-count {
+  color: var(--ink-soft);
   font-size: 0.92rem;
 }
 
@@ -587,11 +717,11 @@ a {
 /* ---------- 7) การ์ดกิจกรรม (ตั๋ว) ---------- */
 /* สีประจำประเภท: เลือกจาก data-type ที่ JS ใส่ให้การ์ด เช่น data-type="กีฬา"
    ไม่ได้สื่อความหมายด้วยสีอย่างเดียว (ข้อ T3) เพราะมีชื่อประเภทเป็นตัวอักษรในป้ายด้วยเสมอ */
-[data-type="วิชาการ"]      { --tint: #dde7ff; --tint-ink: #1d3e8a; }
-[data-type="กีฬา"]         { --tint: #ffe2c7; --tint-ink: #833800; }
-[data-type="จิตอาสา"]      { --tint: #d3f0de; --tint-ink: #155c37; }
-[data-type="ศิลปวัฒนธรรม"] { --tint: #f8dcec; --tint-ink: #84204e; }
-[data-type="ศาสนา"]        { --tint: #fdecc8; --tint-ink: #7a4b00; }
+[data-type="วิชาการ"]      { --tint: #10264a; --tint-ink: #7cc0ff; }
+[data-type="กีฬา"]         { --tint: #3a230f; --tint-ink: #ffb36b; }
+[data-type="จิตอาสา"]      { --tint: #0f3324; --tint-ink: #6ee7b0; }
+[data-type="ศิลปวัฒนธรรม"] { --tint: #3a1430; --tint-ink: #ff8cbd; }
+[data-type="ศาสนา"]        { --tint: #3a2e0c; --tint-ink: #ffd46b; }
 
 /* auto-fill + minmax: จำนวนคอลัมน์ปรับเองตามความกว้าง (มือถือ 1, แท็บเล็ต 2, เดสก์ท็อป 3)
    min(100%, 300px) กันการ์ดกว้างเกินจอที่แคบกว่า 300px */
@@ -608,11 +738,17 @@ a {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
-  transition: border-color 0.2s;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
 }
 
 .ticket:hover {
-  border-color: #aab2c5;
+  border-color: var(--accent-text);
+}
+
+/* การ์ดใบแรกของ "กิจกรรมแนะนำ" ไล่สีฟ้าให้เด่น เหมือนเกมที่ถูกเลือกอยู่ในหน้าเว็บเกม */
+#featured-grid .ticket:first-child {
+  border-color: #2f6fb8;
+  background: linear-gradient(160deg, #0d3f78, var(--surface) 62%);
 }
 
 /* รอยเจาะครึ่งวงกลมบน-ล่าง ตรงแนวเส้นประ
@@ -641,14 +777,14 @@ a {
 
 /* กิจกรรมที่จบแล้ว: ต้นขั้วเป็นสีเทา (มีป้าย "จบแล้ว" เป็นตัวอักษรด้วย) */
 .ticket.is-past {
-  --tint: #e4e7ee;
-  --tint-ink: #3d4660;
+  --tint: #1a2030;
+  --tint-ink: #9aa8c4;
 }
 
 /* การ์ดที่ถูกลิงก์มาถึง (#event-e006) หรือกดจากปฏิทิน */
 .ticket:target,
 .ticket.is-highlight {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--accent-text);
   outline-offset: 3px;
 }
 
@@ -659,7 +795,7 @@ a {
   justify-content: center;
   gap: 2px;
   padding: 16px 4px;
-  border-right: 2px dashed rgba(24, 34, 61, 0.22);
+  border-right: 2px dashed rgba(255, 255, 255, 0.16);
   border-radius: var(--radius) 0 0 var(--radius);
   background: var(--tint);
   color: var(--tint-ink);
@@ -703,10 +839,12 @@ a {
   gap: 6px;
 }
 
+/* ป้ายแบบมีกรอบสีประจำประเภท (เหมือนป้ายแท็กในเว็บเกม) */
 .chip {
   display: inline-block;
-  padding: 2px 10px;
-  border-radius: var(--pill);
+  padding: 1px 9px;
+  border: 1px solid var(--tint-ink);
+  border-radius: 4px;
   background: var(--tint);
   color: var(--tint-ink);
   font-size: 0.8rem;
@@ -714,23 +852,27 @@ a {
 }
 
 .chip-hours {
+  border-color: var(--highlight);
   background: var(--highlight);
-  color: var(--ink);
+  color: #1a1300;
 }
 
 .chip-status {
-  background: #e4e7ee;
-  color: #3d4660;
+  border-color: #3a4a6b;
+  background: #1a2030;
+  color: #b7c3dc;
 }
 
 .chip-full {
+  border-color: var(--danger);
   background: var(--danger-soft);
   color: var(--danger);
 }
 
 .ticket h3 {
-  font-size: 1.15rem;
-  font-weight: 600;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
   line-height: 1.4;
 }
 
@@ -765,18 +907,18 @@ a {
   height: 6px;
   overflow: hidden;
   border-radius: var(--pill);
-  background: #e3e6ee;
+  background: var(--line);
 }
 
 .seat-fill {
   width: 0;                    /* JS ตั้งความกว้างจริงตามสัดส่วนที่นั่งที่ใช้ไป */
   height: 100%;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--accent), var(--accent-text));
   transition: width 0.4s;
 }
 
 .ticket.is-low .seat-fill {
-  background: #c2410c;
+  background: linear-gradient(90deg, #ff4d6d, #ff9a5c);
 }
 
 .seat-text {
@@ -826,18 +968,19 @@ a {
 
 .view-toggle {
   display: inline-flex;
-  padding: 3px;
-  border: 1.5px solid var(--ink);
-  border-radius: var(--pill);
+  padding: 4px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface-2);
 }
 
 .view-toggle button {
   min-height: 38px;
   padding: 0 18px;
   border: 0;
-  border-radius: var(--pill);
+  border-radius: 7px;
   background: transparent;
-  color: var(--ink);
+  color: #b7c3dc;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -845,7 +988,7 @@ a {
 }
 
 .view-toggle button[aria-pressed="true"] {
-  background: var(--ink);
+  background: var(--accent);
   color: #fff;
 }
 
@@ -906,7 +1049,8 @@ a {
 }
 
 .cal-day[aria-current="date"] {
-  border: 2px solid var(--accent);
+  border: 2px solid var(--accent-text);
+  box-shadow: 0 0 14px rgba(30, 155, 255, 0.3);
 }
 
 .cal-date {
@@ -961,14 +1105,16 @@ a {
   gap: 12px;
   padding: 22px;
   border: 1px solid var(--line);
-  border-top: 6px solid var(--tint-ink);
+  border-top: 4px solid var(--tint-ink);
   border-radius: var(--radius);
   background: var(--surface);
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
 }
 
 .club h2 {
-  font-size: 1.35rem;
-  font-weight: 600;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
 }
 
 .club-contact {
@@ -1027,8 +1173,9 @@ a {
 .form-card h2,
 .event-summary h2 {
   margin-bottom: 16px;
-  font-size: 1.3rem;
-  font-weight: 600;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
 }
 
 .field {
@@ -1050,16 +1197,21 @@ a {
   min-height: 46px;
   padding: 8px 14px;
   border: 1.5px solid var(--field-line);
-  border-radius: 10px;
-  background: var(--surface);
+  border-radius: 8px;
+  background: var(--surface-2);
   color: var(--ink);
   font: inherit;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field input::placeholder {
+  color: #8592ad;
 }
 
 .field input:focus,
 .field select:focus {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
+  box-shadow: 0 0 0 3px rgba(77, 179, 255, 0.25);
 }
 
 /* ช่องที่ JS ตรวจแล้วไม่ผ่าน (aria-invalid="true"): ขอบแดง + ข้อความแดงใต้ช่อง */
@@ -1091,7 +1243,7 @@ a {
   width: 22px;
   height: 22px;
   margin: 2px 0 0;
-  accent-color: var(--accent);
+  accent-color: var(--accent-text);
 }
 
 .field-check label {
@@ -1183,8 +1335,9 @@ a {
 .site-footer {
   margin-top: 40px;
   padding-block: 36px;
-  background: var(--ink);
-  color: #d5dbe8;
+  border-top: 1px solid #1a2438;
+  background: #050810;
+  color: var(--ink-soft);
 }
 
 .footer-inner {
@@ -1195,12 +1348,14 @@ a {
 .footer-title {
   color: #fff;
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .site-footer a {
-  color: #fff;
+  color: var(--accent-text);
 }
 
 .site-footer :focus-visible {
@@ -1214,10 +1369,11 @@ a {
   z-index: 200;
   max-width: calc(100% - 32px);
   padding: 12px 22px;
+  border: 1px solid var(--accent-text);
   border-radius: var(--pill);
-  background: var(--ink);
+  background: #13203a;
   color: #fff;
-  box-shadow: 0 10px 30px rgba(24, 34, 61, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 18px rgba(30, 155, 255, 0.25);
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, 16px);
@@ -1319,14 +1475,34 @@ a {
   }
 
   .hero {
-    grid-template-columns: 1.15fr 0.85fr;
-    align-items: center;
     gap: 56px;
-    padding-block: 56px 16px;
+    padding-block: 80px 16px;
   }
 
+  /* แถบนับถอยหลัง: ชื่อกิจกรรมอยู่ซ้าย ตัวเลข 3 ช่องอยู่ขวา */
   .countdown-card {
-    padding: 28px 28px 30px;
+    padding: 28px 32px;
+  }
+
+  #countdown-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 40px;
+    align-items: center;
+  }
+
+  .countdown-title,
+  .countdown-when {
+    grid-column: 1;
+  }
+
+  .timer {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    grid-template-columns: repeat(3, 104px);
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
   }
 
   .filter-form {
@@ -1355,6 +1531,27 @@ a {
 
   .cal-day {
     min-height: 116px;
+  }
+}
+
+
+/* การ์ดลอยขึ้นและมีแสงเรืองตอนชี้เมาส์ (เฉพาะอุปกรณ์ที่มีเมาส์)
+   :focus-within = กด Tab ไปที่ปุ่มหรือลิงก์ในการ์ด การ์ดก็ลอยด้วย คนใช้คีย์บอร์ดเห็นเหมือนกัน */
+@media (hover: hover) {
+  .ticket:hover,
+  .ticket:focus-within,
+  .club:hover,
+  .club:focus-within,
+  .type-links a:hover,
+  .type-links a:focus-visible {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 24px rgba(30, 155, 255, 0.22);
+  }
+
+  .club:hover,
+  .club:focus-within {
+    border-color: var(--accent-text);
+    border-top-color: var(--tint-ink);
   }
 }
 

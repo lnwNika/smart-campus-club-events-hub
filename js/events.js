@@ -197,7 +197,7 @@ registerPage('events', function () {
           `<span class="cal-event-text">${escapeHtml(e.start)} ${escapeHtml(e.title)}</span></a></li>`;
       }
 
-      // aria-current="date" = วันนี้ (CSS ใช้ทำกรอบสีม่วง)
+      // aria-current="date" = วันนี้ (CSS ใช้ทำกรอบสีฟ้า)
       const current = key === todayKey ? ' aria-current="date"' : '';
       // วันที่เต็มสำหรับโปรแกรมอ่านหน้าจอ เช่น "5 ธันวาคม 2569"
       const fullDate = new Date(calYear, calMonth, day).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });

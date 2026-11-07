@@ -22,11 +22,13 @@
   <title>Club &amp; Events Hub — รวมกิจกรรมชมรมในมหาวิทยาลัย</title>
   <meta name="description" content="รวมกิจกรรมชมรมในมหาวิทยาลัย ค้นหา ลงทะเบียน และติดตามกิจกรรมที่นับชั่วโมงกิจกรรมได้">
 
-  <!-- ฟอนต์ Noto Sans Thai (ฟอนต์เดียวทั้งเว็บ) เก็บไว้ในโฟลเดอร์ fonts/ ของเว็บเอง
+  <!-- ฟอนต์ Noto Sans Thai (เนื้อหา) และ Chakra Petch (หัวข้อ) เก็บไว้ในโฟลเดอร์ fonts/ ของเว็บเอง
        ไม่ต้องรอโหลด CSS จาก Google Fonts ก่อน หน้าเว็บจึงแสดงเร็วขึ้น (คะแนน Performance ใน Lighthouse)
        preload = บอกเบราว์เซอร์ให้เริ่มโหลดไฟล์ฟอนต์ทันที ส่วน @font-face อยู่ใน css/style.css -->
+  <link rel="preload" href="fonts/chakra-petch-700-thai.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/noto-sans-thai-thai.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/noto-sans-thai-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/chakra-petch-700-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- CSS ไฟล์เดียวใช้ทุกหน้า (ข้อ T4: ห้าม inline style) -->
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
@@ -61,6 +63,7 @@
     <!-- ===== HERO: ข้อความต้อนรับ + นับถอยหลัง ===== -->
     <section class="hero container" aria-labelledby="hero-title">
       <div class="hero-text">
+        <p class="eyebrow">BSRU · SMART CAMPUS</p>
         <h1 id="hero-title">ทุกกิจกรรมชมรม<br>รวมไว้ในที่เดียว</h1>
         <p class="hero-lead">
           ไม่ต้องไล่ดูทีละเพจหรือกลุ่ม LINE อีกต่อไป ค้นหากิจกรรม ดูที่นั่งที่เหลือ
