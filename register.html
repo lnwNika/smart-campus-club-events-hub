@@ -2,7 +2,7 @@
 <!--
   =========================================================
   register.html — ฟอร์มลงทะเบียนเข้าร่วมกิจกรรม (F4, F5)
-  JavaScript: js/register.js (เริ่มทำงานผ่าน js/router.js)
+  JavaScript: js/register.js
 
   validation 2 ชั้น (ข้อ T2)
     ชั้นที่ 1 HTML : required, pattern, type="email", minlength
@@ -165,14 +165,8 @@
 
   <div class="notice" id="notice" role="status" aria-live="polite"></div>
 
-  <!-- JavaScript: ทุกหน้าโหลดครบทุกไฟล์ เพื่อให้ router.js สลับหน้าได้โดยไม่โหลดใหม่
-       ลำดับสำคัญ: common.js ก่อน (ฟังก์ชันที่ใช้ร่วม) → ไฟล์ของแต่ละหน้า → router.js ท้ายสุด (เริ่มทำงาน) -->
+  <!-- JavaScript: common.js ก่อน (ฟังก์ชันที่ใช้ร่วมกันทุกหน้า) แล้วตามด้วยไฟล์ของหน้านี้ -->
   <script src="js/common.js"></script>
-  <script src="js/home.js"></script>
-  <script src="js/events.js"></script>
-  <script src="js/clubs.js"></script>
   <script src="js/register.js"></script>
-  <script src="js/my-events.js"></script>
-  <script src="js/router.js"></script>
 </body>
 </html>

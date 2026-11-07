@@ -45,7 +45,6 @@
 | F6 | นับถอยหลัง วัน : ชั่วโมง : นาที ด้วย `setInterval` | ✅ | `js/common.js` → `renderCountdown()` |
 | เสริม | มุมมองปฏิทินรายเดือนด้วย CSS Grid | ✅ | `js/events.js` → `renderCalendar()` |
 | เสริม | ปุ่มแชร์กิจกรรม (Clipboard API) | ✅ | `js/common.js` → `shareEvent()` |
-| เสริม | เปลี่ยนหน้าโดยไม่โหลดใหม่ทั้งหน้า (fetch + History API) | ✅ | `js/router.js` → `goTo()` |
 
 **เทคโนโลยี:** HTML, CSS และ JavaScript ล้วน ไม่ใช้ framework หรือ library (ใช้เฉพาะ Google Fonts: Noto Sans Thai)
 

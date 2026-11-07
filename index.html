@@ -11,7 +11,7 @@
     2) กิจกรรมแนะนำ (กิจกรรมที่ featured = true ใน data/events.json)
     3) ลิงก์ลัดไปหน้ากิจกรรมแบบกรองตามประเภท
 
-  ไฟล์ JavaScript ของหน้านี้: js/home.js (ใช้ฟังก์ชันร่วมจาก js/common.js และเริ่มทำงานผ่าน js/router.js)
+  ไฟล์ JavaScript ของหน้านี้: js/home.js (ใช้ฟังก์ชันร่วมจาก js/common.js)
   จุดที่ JavaScript เติมเนื้อหาให้มีคำว่า [JS] กำกับไว้ใน comment
   =========================================================
 -->
@@ -126,14 +126,8 @@
   <!-- [JS] กล่องแจ้งเตือนมุมล่าง role="status" ให้โปรแกรมอ่านหน้าจออ่านเมื่อข้อความเปลี่ยน -->
   <div class="notice" id="notice" role="status" aria-live="polite"></div>
 
-  <!-- JavaScript: ทุกหน้าโหลดครบทุกไฟล์ เพื่อให้ router.js สลับหน้าได้โดยไม่โหลดใหม่
-       ลำดับสำคัญ: common.js ก่อน (ฟังก์ชันที่ใช้ร่วม) → ไฟล์ของแต่ละหน้า → router.js ท้ายสุด (เริ่มทำงาน) -->
+  <!-- JavaScript: common.js ก่อน (ฟังก์ชันที่ใช้ร่วมกันทุกหน้า) แล้วตามด้วยไฟล์ของหน้านี้ -->
   <script src="js/common.js"></script>
   <script src="js/home.js"></script>
-  <script src="js/events.js"></script>
-  <script src="js/clubs.js"></script>
-  <script src="js/register.js"></script>
-  <script src="js/my-events.js"></script>
-  <script src="js/router.js"></script>
 </body>
 </html>

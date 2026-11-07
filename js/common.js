@@ -2,10 +2,9 @@
    common.js — ฟังก์ชันที่ใช้ร่วมกันทุกหน้า
    Club & Events Hub · SC17332 กลุ่มที่ 3
 
-   ทุกหน้าโหลดไฟล์ JavaScript ครบทุกไฟล์ ตามลำดับนี้
-     common.js → home.js, events.js, clubs.js, register.js, my-events.js → router.js
-   common.js มาก่อน ไฟล์อื่นจึงเรียกใช้ฟังก์ชันในไฟล์นี้ได้
-   router.js มาท้ายสุด เพราะต้องรอให้ทุกหน้าลงทะเบียนด้วย registerPage() ก่อน
+   แต่ละหน้าโหลด JavaScript 2 ไฟล์ ตามลำดับนี้
+     common.js → ไฟล์ของหน้านั้น (เช่น index.html ใช้ home.js)
+   common.js มาก่อน ไฟล์ของหน้าจึงเรียกใช้ฟังก์ชันในไฟล์นี้ได้
 
    แบ่งเป็น 8 ส่วน
      1) ค่าตั้งต้น              5) การ์ดกิจกรรม (ตั๋ว) + ปุ่มแชร์
@@ -34,14 +33,13 @@ const STORAGE_KEY = 'ceh-registrations';
 // ถ้าที่นั่งเหลือไม่เกินค่านี้ ถือว่า "ใกล้เต็ม"
 const LOW_SEAT_LIMIT = 5;
 
-// ทะเบียนหน้าเว็บ: ชื่อหน้า → ฟังก์ชันที่ทำให้หน้านั้นทำงาน
-// แต่ละไฟล์ (home.js, events.js ...) ลงทะเบียนตัวเองด้วย registerPage()
-// แล้ว router.js เป็นคนเรียกฟังก์ชันของหน้าที่กำลังเปิด (ดูคำอธิบายใน router.js)
-//   ชื่อหน้าตรงกับ <body data-page="..."> ในไฟล์ HTML
-const pages = {};
-
+// เริ่มการทำงานของหน้า
+// แต่ละไฟล์ (home.js, events.js ...) เรียก registerPage() พร้อมฟังก์ชันของหน้านั้น
+// ฟังก์ชันจะทำงานก็ต่อเมื่อชื่อหน้าตรงกับ <body data-page="..."> ในไฟล์ HTML
 function registerPage(name, start) {
-  pages[name] = start;
+  if (document.body.dataset.page === name) {
+    start();
+  }
 }
 
 
@@ -500,12 +498,6 @@ function renderCountdown(box, event, club) {
   countdownTimer = setInterval(tick, 1000);
 }
 
-// หยุดนับถอยหลัง router.js เรียกก่อนเปลี่ยนหน้า
-// (ไม่หยุด = setInterval ยังทำงานต่อทุกวินาที ทั้งที่กล่องนับถอยหลังถูกลบจากหน้าไปแล้ว)
-function stopCountdown() {
-  clearInterval(countdownTimer);
-}
-
 // แสดงข้อความแทนการนับถอยหลัง (เช่น ไม่มีกิจกรรมที่กำลังจะมาถึง)
 function renderCountdownEmpty(box, html) {
   clearInterval(countdownTimer);
@@ -548,4 +540,5 @@ function updateNavBadge() {
 
 
 /* ---------- 8) เริ่มทำงาน ---------- */
-// ตัวเลขบนเมนูอัปเดตใน router.js ทุกครั้งที่เปลี่ยนหน้า
+// <script> อยู่ท้าย <body> เมนูจึงโหลดเสร็จแล้ว แสดงตัวเลขบนเมนูได้ทันทีทุกหน้า
+updateNavBadge();
