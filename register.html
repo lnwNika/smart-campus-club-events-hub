@@ -90,8 +90,7 @@
 
           <div class="field">
             <label for="student-id">รหัสนักศึกษา *</label>
-            <!-- TODO(กลุ่ม): แก้ pattern และข้อความ hint ให้ตรงกับรูปแบบรหัสนักศึกษาของมหาวิทยาลัยเรา
-                 ตอนนี้ตั้งไว้เป็น "ตัวเลข 10 หลัก" ([0-9]{10})
+            <!-- pattern="[0-9]{10}" = รหัสนักศึกษาเป็นตัวเลข 10 หลัก
                  register.js อ่าน pattern จาก attribute นี้โดยตรง แก้ที่นี่ที่เดียวพอ
 
                  inputmode="numeric" = มือถือแสดงแป้นตัวเลข
@@ -99,7 +98,7 @@
             <input type="text" id="student-id" name="studentId" required pattern="[0-9]{10}"
                    inputmode="numeric" maxlength="10" autocomplete="off"
                    aria-describedby="student-id-hint student-id-error">
-            <p class="field-hint" id="student-id-hint"></p>
+            <p class="field-hint" id="student-id-hint">ตัวเลข 10 หลัก เช่น 6721207001</p>
             <p class="field-error" id="student-id-error"></p>
           </div>
 
@@ -113,7 +112,6 @@
 
           <div class="field">
             <label for="faculty">คณะ *</label>
-            <!-- TODO(กลุ่ม): แก้รายชื่อคณะให้ตรงกับมหาวิทยาลัยของเรา -->
             <select id="faculty" name="faculty" required aria-describedby="faculty-error">
               <option value="">เลือกคณะ</option>
               <option>คณะวิทยาศาสตร์และเทคโนโลยี</option>
@@ -160,7 +158,7 @@
       <p>
         งาน Mini Project รายวิชา SC17332 กลุ่มที่ 3 ข้อมูลกิจกรรมรวบรวมจากชมรมในมหาวิทยาลัย
         ดูแหล่งที่มาของข้อมูลได้ใน
-        <a href="https://github.com/">README ของโปรเจกต์</a>
+        <a href="https://github.com/lnwNika/smart-campus-club-events-hub#readme">README ของโปรเจกต์</a>
       </p>
     </div>
   </footer>

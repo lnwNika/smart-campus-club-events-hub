@@ -94,7 +94,7 @@
 
 ## ผล Lighthouse (Accessibility)
 
-TODO: แนบภาพหน้าจอผล Lighthouse ของหน้าหลัก เช่น `![Lighthouse](images/lighthouse.png)`
+![ผล Lighthouse ของหน้าหลัก: Accessibility 100](images/lighthouse.png)
 
 ## การใช้ AI
 
