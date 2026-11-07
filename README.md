@@ -1,4 +1,4 @@
-<img width="530" height="552" alt="image" src="https://github.com/user-attachments/assets/d42ecf28-2cfe-4554-99db-606782b42bbd" /># Club & Events Hub — รวมกิจกรรมชมรมและระบบลงทะเบียนเข้าร่วม
+# Club & Events Hub — รวมกิจกรรมชมรมและระบบลงทะเบียนเข้าร่วม
 
 รายวิชา SC17332 · Mini Project Smart Campus · **กลุ่มที่ 3**
 
