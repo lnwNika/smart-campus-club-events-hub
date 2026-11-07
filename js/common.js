@@ -388,24 +388,11 @@ function createTicket(event, club, options) {
           <div><dt>เวลา</dt><dd>${formatTimeRange(event)}</dd></div>
           <div><dt>สถานที่</dt><dd>${escapeHtml(event.place || 'ไม่ระบุสถานที่')}</dd></div>
         </dl>
-        ${event.dateAdjusted && event.originalDate ? '<p class="ticket-note">ปรับวันที่เพื่อสาธิต วันจัดจริง ' + formatThaiDate(event.originalDate) + '</p>' : ''}
-        ${sourceLink(event)}
         ${options.extraInfo || ''}
         ${seats}
         <div class="ticket-actions">${actions}</div>
       </div>
     </article>`;
-}
-
-// ลิงก์ไปโพสต์ต้นฉบับ (ข้อ T8: ข้อมูลทุกกิจกรรมต้องมีแหล่งที่มา)
-// target="_blank" เปิดแท็บใหม่ rel="noopener" กันหน้าใหม่ควบคุมหน้าเว็บเรา
-function sourceLink(event) {
-  if (!event.source) {
-    return '';
-  }
-  return '<p class="ticket-source"><a href="' + escapeHtml(event.source) + '" target="_blank" rel="noopener">' +
-    'ดูโพสต์ต้นฉบับ<span class="visually-hidden"> ของ ' + escapeHtml(event.title) + ' (เปิดแท็บใหม่)</span></a>' +
-    (event.sourceNote ? '<br><small>' + escapeHtml(event.sourceNote) + '</small>' : '') + '</p>';
 }
 
 // ตั้งความกว้างแถบที่นั่งของทุกการ์ดใน container (ต้องเรียกหลังใส่ innerHTML)

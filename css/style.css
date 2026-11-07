@@ -766,22 +766,6 @@ a {
   padding-top: 4px;
 }
 
-/* ลิงก์ไปโพสต์ต้นฉบับ + หมายเหตุแหล่งที่มา (ข้อ T8) */
-.ticket-source {
-  color: var(--ink-soft);
-  font-size: 0.85rem;
-  line-height: 1.5;
-}
-
-.ticket-source a {
-  font-weight: 600;
-}
-
-.ticket-note {
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-}
-
 
 /* ---------- 8) ตัวกรอง ---------- */
 .filters {
