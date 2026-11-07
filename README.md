@@ -2,8 +2,6 @@
 
 รายวิชา SC17332 · Mini Project Smart Campus · **กลุ่มที่ 3**
 
-> ✏️ ไฟล์นี้เป็นแม่แบบ กรอกทุกช่องที่มีเครื่องหมาย `TODO` ก่อนส่ง แล้วลบบรรทัดนี้ออก
-
 **เว็บไซต์:** https://lnwnika.github.io/smart-campus-club-events-hub/
 
 ## ปัญหาที่แก้
