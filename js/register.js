@@ -40,8 +40,7 @@ registerPage('register', function () {
     },
     'student-id': {
       valueMissing: 'กรอกรหัสนักศึกษา',
-      // ใช้ข้อความ hint ใต้ช่อง เพื่อให้แก้รูปแบบรหัสที่ register.html ที่เดียว
-      patternMismatch: 'รหัสนักศึกษาไม่ถูกรูปแบบ: ' + document.querySelector('#student-id-hint').textContent
+      patternMismatch: 'รหัสนักศึกษาไม่ถูกรูปแบบ: ตัวเลข 10 หลัก เช่น 6721207001'
     },
     'email': {
       valueMissing: 'กรอกอีเมล',
@@ -175,6 +174,9 @@ registerPage('register', function () {
     let hours = '<span class="chip chip-status">ไม่ระบุชั่วโมงกิจกรรม</span>';
     if (event.activityHours > 0) {
       hours = '<span class="chip chip-hours">นับ ' + event.activityHours + ' ชั่วโมงกิจกรรม</span>';
+    }
+    if (event.loanHours === true) {
+      hours = '<span class="chip chip-hours">กิจกรรมที่ได้ชั่วโมงกยศ.</span>';
     }
 
     summaryBox.innerHTML = `

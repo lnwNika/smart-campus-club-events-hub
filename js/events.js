@@ -89,7 +89,8 @@ registerPage('events', function () {
       if (clubId !== '' && e.clubId !== clubId) {
         return false;
       }
-      if (onlyHours && !(e.activityHours > 0)) {
+      // ติ๊ก "เฉพาะกิจกรรมที่ได้ชั่วโมงกยศ." → เหลือเฉพาะกิจกรรมที่ loanHours เป็น true
+      if (onlyHours && e.loanHours !== true) {
         return false;
       }
       if (keyword !== '') {

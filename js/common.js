@@ -314,10 +314,13 @@ function createTicket(event, club, options) {
     classes += ' is-low';
   }
 
-  // ป้ายเหนือชื่อกิจกรรม: ประเภท + ชั่วโมงกิจกรรม + สถานะ
+  // ป้ายเหนือชื่อกิจกรรม: ประเภท + ชั่วโมงกิจกรรม + ชั่วโมงกยศ. + สถานะ
   let tags = '<span class="chip">' + escapeHtml(event.type) + '</span>';
   if (event.activityHours > 0) {
     tags += '<span class="chip chip-hours">นับ ' + event.activityHours + ' ชั่วโมงกิจกรรม</span>';
+  }
+  if (event.loanHours === true) {
+    tags += '<span class="chip chip-hours">กิจกรรมที่ได้ชั่วโมงกยศ.</span>';
   }
   if (past) {
     tags += '<span class="chip chip-status">จบแล้ว</span>';
