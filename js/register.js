@@ -171,7 +171,7 @@ registerPage('register', function () {
 
     const club = findClub(allClubs, event.clubId);
     const left = seatsLeft(event);
-    let hours = '<span class="chip chip-status">ไม่ระบุชั่วโมงกิจกรรม</span>';
+    let hours = '';
     if (event.activityHours > 0) {
       hours = '<span class="chip chip-hours">นับ ' + event.activityHours + ' ชั่วโมงกิจกรรม</span>';
     }
