@@ -22,7 +22,6 @@
 /* ---------- 1) ค่าตั้งต้น ---------- */
 
 // ที่อยู่ของข้อมูล (relative path ไม่ขึ้นต้นด้วย / เพื่อให้ทำงานบน GitHub Pages ได้)
-// ถ้าใช้เวอร์ชัน PHP + MySQL (โฟลเดอร์ php-version) ให้เปลี่ยนเป็น 'api.php'
 const DATA_URL = 'data/events.json';
 
 // ชื่อ key ใน localStorage
@@ -65,11 +64,6 @@ async function loadData() {
 
   // response.json() จะโยน error เองถ้าไฟล์ JSON เขียนผิดรูปแบบ (เช่น ลืมจุลภาค)
   const data = await response.json();
-
-  // api.php (เวอร์ชัน PHP) ส่ง { ok: false, error: '...' } เมื่อผิดพลาด
-  if (data.ok === false) {
-    throw new Error(data.error);
-  }
 
   // ตรวจโครงสร้างก่อนใช้ ถ้าไม่มี array ที่ต้องการ แปลว่าไฟล์ข้อมูลผิด
   if (!Array.isArray(data.clubs) || !Array.isArray(data.events)) {

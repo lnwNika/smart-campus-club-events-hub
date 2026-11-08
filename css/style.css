@@ -724,7 +724,7 @@ a {
 [data-type="ศาสนา"]        { --tint: #3a2e0c; --tint-ink: #ffd46b; }
 
 /* auto-fill + minmax: จำนวนคอลัมน์ปรับเองตามความกว้าง (มือถือ 1, แท็บเล็ต 2, เดสก์ท็อป 3)
-   min(100%, 300px) กันการ์ดกว้างเกินจอที่แคบกว่า 300px */
+   min(100%, 310px) กันการ์ดกว้างเกินจอที่แคบกว่า 310px */
 .ticket-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
