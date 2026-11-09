@@ -801,7 +801,9 @@ a {
   color: var(--tint-ink);
   text-align: center;
 }
-
+#event-e09 .ticket-stub {
+   background: rgb(31,78,140)
+      }
 .stub-month {
   font-size: 0.85rem;
   font-weight: 600;
